@@ -20,6 +20,9 @@ import {
   Edit,
   Power,
   ShieldAlert,
+  Loader2,
+  Mail,
+  User,
 } from "lucide-react";
 
 interface StaffUser {
@@ -204,28 +207,30 @@ export default function UsersPage() {
   });
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950 border border-purple-500/20 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="rounded-2xl bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950 border border-purple-500/30 p-6 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl relative overflow-hidden">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Badge className="bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs">
-              Administrator Console
+            <Badge className="bg-purple-500/20 text-purple-400 border border-purple-500/30 text-[11px] font-mono">
+              Staff RBAC Administration
             </Badge>
-            <span className="text-xs text-muted-foreground font-mono">{users.length} Registered Accounts</span>
+            <span className="text-xs text-muted-foreground font-mono bg-background/50 px-2 py-0.5 rounded border border-border/60">
+              {users.length} Active Accounts
+            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
             User & Team Management
           </h1>
-          <p className="text-sm text-muted-foreground max-w-2xl">
+          <p className="text-xs text-muted-foreground max-w-2xl">
             Provision staff member accounts, configure institutional role permissions (Doctor, Technician, Administrator),
-            and manage security access.
+            and enforce security access policies.
           </p>
         </div>
 
         <Button
           onClick={() => setIsCreateOpen(true)}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-md shadow-purple-500/20 h-10 px-4 rounded-xl"
+          className="bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-lg shadow-purple-500/20 h-10 px-4 rounded-xl text-xs"
           data-testid="button-add-user"
         >
           <UserPlus className="h-4 w-4 mr-2" />
@@ -234,22 +239,22 @@ export default function UsersPage() {
       </div>
 
       {/* Filter Row */}
-      <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
+      <Card className="border-border/80 bg-card/70 backdrop-blur-sm shadow-md">
         <CardContent className="p-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="sm:col-span-2 relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search staff by name, username, email, title..."
+                placeholder="Search staff by name, username, email, specialty..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9 text-xs bg-background/60"
+                className="pl-9 h-9 text-xs bg-background/70 border-border"
                 data-testid="input-search-users"
               />
             </div>
             <div>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="h-9 text-xs bg-background/60">
+                <SelectTrigger className="h-9 text-xs bg-background/70 border-border">
                   <SelectValue placeholder="Role Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -265,20 +270,26 @@ export default function UsersPage() {
       </Card>
 
       {/* Users Table */}
-      <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
-        <CardHeader className="pb-3 border-b border-border/60">
+      <Card className="border-border/80 bg-card/70 backdrop-blur-sm shadow-md overflow-hidden">
+        <CardHeader className="pb-3 border-b border-border/70 bg-background/40">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-bold text-foreground">Staff Directory</CardTitle>
+            <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Users className="h-4 w-4 text-purple-400" />
+              Staff Directory & Role Assignments
+            </CardTitle>
             <span className="text-xs text-muted-foreground font-mono">{filteredUsers.length} staff members</span>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="py-12 text-center text-xs text-muted-foreground">Loading staff accounts...</div>
+            <div className="py-16 text-center text-xs text-muted-foreground font-mono animate-pulse">
+              Loading clinical staff directory...
+            </div>
           ) : filteredUsers.length === 0 ? (
             <div className="py-16 text-center space-y-3">
-              <Users className="h-10 w-10 text-muted-foreground mx-auto" />
+              <Users className="h-10 w-10 text-muted-foreground/40 mx-auto" />
               <p className="text-sm font-medium text-foreground">No staff members found</p>
+              <p className="text-xs text-muted-foreground">Adjust search query or enroll new staff</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -299,12 +310,12 @@ export default function UsersPage() {
                     <tr key={u.id} className="hover:bg-accent/40 transition-colors">
                       <td className="py-3 pl-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold flex items-center justify-center text-xs">
+                          <div className="h-8 w-8 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold flex items-center justify-center text-xs shadow-sm">
                             {u.avatar || u.fullName.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-semibold text-foreground">{u.fullName}</p>
-                            <p className="text-[11px] text-muted-foreground">{u.email}</p>
+                            <p className="font-semibold text-foreground text-xs">{u.fullName}</p>
+                            <p className="text-[11px] text-muted-foreground font-mono">{u.email}</p>
                           </div>
                         </div>
                       </td>
@@ -313,29 +324,29 @@ export default function UsersPage() {
                           variant="outline"
                           className={
                             u.role === "admin"
-                              ? "bg-purple-500/10 text-purple-400 border-purple-500/30"
+                              ? "bg-purple-500/10 text-purple-400 border-purple-500/30 text-[10px]"
                               : u.role === "doctor"
-                              ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
-                              : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                              ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30 text-[10px]"
+                              : "bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px]"
                           }
                         >
                           {u.role.toUpperCase()}
                         </Badge>
                       </td>
-                      <td className="py-3 text-muted-foreground">{u.title || "Clinical Staff"}</td>
-                      <td className="py-3 font-mono text-muted-foreground">@{u.username}</td>
+                      <td className="py-3 text-muted-foreground text-xs">{u.title || "Clinical Staff"}</td>
+                      <td className="py-3 font-mono text-muted-foreground text-xs">@{u.username}</td>
                       <td className="py-3">
                         <Badge
                           className={
                             u.isActive
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px]"
-                              : "bg-destructive/20 text-destructive border-destructive/30 text-[10px]"
+                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px]"
+                              : "bg-destructive/20 text-destructive border border-destructive/30 text-[10px]"
                           }
                         >
                           {u.isActive ? "ACTIVE" : "DEACTIVATED"}
                         </Badge>
                       </td>
-                      <td className="py-3 text-muted-foreground">
+                      <td className="py-3 text-muted-foreground font-mono text-[11px]">
                         {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "Active"}
                       </td>
                       <td className="py-3 text-right pr-4">
@@ -344,7 +355,7 @@ export default function UsersPage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEditOpen(u)}
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-cyan-400 hover:bg-cyan-950/30"
                             title="Edit User"
                             data-testid={`button-edit-user-${u.username}`}
                           >
@@ -374,10 +385,10 @@ export default function UsersPage() {
 
       {/* Add Staff Modal */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-md bg-card text-foreground">
+        <DialogContent className="sm:max-w-md bg-card text-foreground border-border/80 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-base font-bold flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-purple-500" />
+              <UserPlus className="h-5 w-5 text-purple-400" />
               Enroll New Staff Member
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
@@ -385,14 +396,14 @@ export default function UsersPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleCreateSubmit} className="space-y-4 py-2">
+          <form onSubmit={handleCreateSubmit} className="space-y-3.5 py-2">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">Full Name *</Label>
               <Input
                 placeholder="e.g. Dr. Marcus Brody"
                 value={newFullName}
                 onChange={(e) => setNewFullName(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-background/70 border-border"
                 required
               />
             </div>
@@ -404,7 +415,7 @@ export default function UsersPage() {
                   placeholder="e.g. mbrody"
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
-                  className="h-9 text-xs"
+                  className="h-9 text-xs bg-background/70 border-border font-mono"
                   required
                 />
               </div>
@@ -412,7 +423,7 @@ export default function UsersPage() {
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">Role *</Label>
                 <Select value={newRole} onValueChange={(val: any) => setNewRole(val)}>
-                  <SelectTrigger className="h-9 text-xs">
+                  <SelectTrigger className="h-9 text-xs bg-background/70 border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -431,7 +442,7 @@ export default function UsersPage() {
                 placeholder="mbrody@hospital.org"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-background/70 border-border font-mono"
                 required
               />
             </div>
@@ -442,7 +453,7 @@ export default function UsersPage() {
                 placeholder="e.g. Senior Pediatric Neuroradiologist"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-background/70 border-border"
               />
             </div>
 
@@ -453,22 +464,28 @@ export default function UsersPage() {
                 placeholder="••••••••"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-background/70 border-border font-mono"
                 required
               />
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>
+              <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)} className="text-xs">
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={createUserMutation.isPending}
                 size="sm"
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white text-xs shadow-md shadow-purple-500/20"
               >
-                {createUserMutation.isPending ? "Creating..." : "Create Account"}
+                {createUserMutation.isPending ? (
+                  <span className="flex items-center gap-1.5">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Provisioning...
+                  </span>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -477,21 +494,24 @@ export default function UsersPage() {
 
       {/* Edit Staff Modal */}
       <Dialog open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
-        <DialogContent className="sm:max-w-md bg-card text-foreground">
+        <DialogContent className="sm:max-w-md bg-card text-foreground border-border/80 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold">Edit Staff Profile</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <Edit className="h-4 w-4 text-cyan-400" />
+              Edit Staff Profile
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground font-mono">
               Update credentials and role assignment for @{selectedUser?.username}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-3.5 py-2">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">Full Name</Label>
               <Input
                 value={editFullName}
                 onChange={(e) => setEditFullName(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-background/70 border-border"
               />
             </div>
 
@@ -500,7 +520,7 @@ export default function UsersPage() {
               <Input
                 value={editEmail}
                 onChange={(e) => setEditEmail(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-background/70 border-border font-mono"
               />
             </div>
 
@@ -508,7 +528,7 @@ export default function UsersPage() {
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">Role</Label>
                 <Select value={editRole} onValueChange={setEditRole}>
-                  <SelectTrigger className="h-9 text-xs">
+                  <SelectTrigger className="h-9 text-xs bg-background/70 border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -524,21 +544,21 @@ export default function UsersPage() {
                 <Input
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="h-9 text-xs"
+                  className="h-9 text-xs bg-background/70 border-border"
                 />
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setSelectedUser(null)}>
+            <Button variant="outline" size="sm" onClick={() => setSelectedUser(null)} className="text-xs">
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={handleEditSave}
               disabled={updateUserMutation.isPending}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-purple-600 hover:bg-purple-700 text-white text-xs shadow-md shadow-purple-500/20"
             >
               {updateUserMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>

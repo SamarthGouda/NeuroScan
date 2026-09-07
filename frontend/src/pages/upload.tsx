@@ -26,6 +26,7 @@ import {
   ArrowRight,
   ShieldCheck,
   ImageIcon,
+  Cpu,
 } from "lucide-react";
 
 interface Stage {
@@ -36,7 +37,7 @@ interface Stage {
 }
 
 const STAGES: Stage[] = [
-  { id: 1, label: "Ingesting & Validating MRI", detail: "Checking image integrity, resolution, and header metadata", icon: ScanLine },
+  { id: 1, label: "Ingesting & Validating MRI Tensor", detail: "Checking image integrity, resolution, and header metadata", icon: ScanLine },
   { id: 2, label: "Tensor Preprocessing & Normalization", detail: "Resizing to 224x224 and applying ImageNet normalization", icon: Layers },
   { id: 3, label: "CNN-ViT Dual-Branch Feature Extraction", detail: "Extracting ResNet-50 local textures & Swin Transformer global context", icon: Brain },
   { id: 4, label: "Bayesian Uncertainty Quantification", detail: "Executing 50 Monte Carlo Dropout passes to compute probability variance", icon: Activity },
@@ -71,7 +72,7 @@ export default function UploadPage() {
   const handleFileChange = (selectedFile: File) => {
     if (!selectedFile.type.startsWith("image/")) {
       toast({
-        title: "Invalid File Type",
+        title: "Invalid File Format",
         description: "Please upload an MRI brain slice in JPG, PNG, or DICOM-derived format.",
         variant: "destructive",
       });
@@ -152,7 +153,7 @@ export default function UploadPage() {
 
       toast({
         title: "Analysis Complete",
-        description: `Tumor Classification: ${scan.tumorType || "Processed successfully"}.`,
+        description: `Diagnosis: ${scan.tumorType || "Processed successfully"}.`,
       });
 
       setIsProcessing(false);
@@ -174,8 +175,8 @@ export default function UploadPage() {
     e.preventDefault();
     if (!file) {
       toast({
-        title: "File Required",
-        description: "Please select or drop a brain MRI scan image before submitting.",
+        title: "MRI Scan Required",
+        description: "Please select or drop an axial brain MRI slice before submitting.",
         variant: "destructive",
       });
       return;
@@ -184,61 +185,67 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Page Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-blue-950/30 border border-cyan-500/20 p-6">
-        <div className="flex items-center gap-2">
-          <Badge className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs">
-            Deep Learning Analysis Pipeline
-          </Badge>
-          <span className="text-xs text-muted-foreground">Attention U-Net & XAI Enabled</span>
+    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+      {/* ─── Intake Console Header ────────────────────────────────────── */}
+      <div className="rounded-2xl bg-card/75 backdrop-blur-2xl border border-white/[0.08] p-6 sm:p-8 relative overflow-hidden shadow-2xl shadow-cyan-950/20">
+        <div className="absolute top-0 right-0 w-96 h-40 bg-gradient-to-bl from-cyan-500/10 via-blue-500/5 to-transparent blur-3xl pointer-events-none rounded-full" />
+
+        <div className="space-y-1.5 relative z-10">
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <Badge className="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5">
+              Radiology Intake Portal
+            </Badge>
+            <span className="text-muted-foreground">•</span>
+            <span className="text-muted-foreground">Attention U-Net & XAI Enabled</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground" data-testid="text-page-title">
+            New Brain MRI Intake & Analysis
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
+            Register patient clinical demographics, ingest an axial brain MRI slice, and trigger the
+            autonomous CNN-ViT classification, segmentation, and explainability workflow.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-2" data-testid="text-page-title">
-          New Brain MRI Analysis
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-2xl mt-1">
-          Enter patient details, upload an axial MRI brain scan, and initiate the autonomous multi-stage diagnostic workflow.
-        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Patient Information */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column: Patient Demographics */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
-            <CardHeader className="pb-4 border-b border-border/60">
+          <Card className="border-border/70 bg-card/75 backdrop-blur-xl shadow-xl">
+            <CardHeader className="pb-3 border-b border-border/60">
               <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                <User className="h-4 w-4 text-cyan-500" />
+                <User className="h-4 w-4 text-cyan-400" />
                 Patient Demographics
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Clinical records will be linked to this patient ID
+                Clinical records will be linked to this patient identification
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-4">
               <div className="space-y-1.5">
-                <Label htmlFor="patientId" className="text-xs font-semibold text-foreground">
-                  Patient ID / MRN
+                <Label htmlFor="patientId" className="text-xs font-bold text-foreground font-mono">
+                  Patient MRN / ID
                 </Label>
                 <Input
                   id="patientId"
-                  placeholder="e.g. PT-2026-0841 (Auto-generated if blank)"
+                  placeholder="e.g. PT-2026-0841 (Auto-assigned if empty)"
                   value={patientId}
                   onChange={(e) => setPatientId(e.target.value)}
-                  className="h-9 text-xs bg-background/60"
+                  className="h-9 text-xs bg-background/60 border-border/70 rounded-xl font-mono"
                   data-testid="input-patient-id"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="patientName" className="text-xs font-semibold text-foreground">
-                  Full Name <span className="text-red-500">*</span>
+                <Label htmlFor="patientName" className="text-xs font-bold text-foreground">
+                  Patient Full Name <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="patientName"
                   placeholder="e.g. Eleanor Vance"
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
-                  className="h-9 text-xs bg-background/60"
+                  className="h-9 text-xs bg-background/60 border-border/70 rounded-xl"
                   data-testid="input-patient-name"
                   required
                 />
@@ -246,7 +253,7 @@ export default function UploadPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="patientAge" className="text-xs font-semibold text-foreground">
+                  <Label htmlFor="patientAge" className="text-xs font-bold text-foreground font-mono">
                     Age
                   </Label>
                   <Input
@@ -255,17 +262,17 @@ export default function UploadPage() {
                     placeholder="e.g. 54"
                     value={patientAge}
                     onChange={(e) => setPatientAge(e.target.value)}
-                    className="h-9 text-xs bg-background/60"
+                    className="h-9 text-xs bg-background/60 border-border/70 rounded-xl font-mono"
                     data-testid="input-patient-age"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="patientGender" className="text-xs font-semibold text-foreground">
+                  <Label htmlFor="patientGender" className="text-xs font-bold text-foreground">
                     Gender
                   </Label>
                   <Select value={patientGender} onValueChange={setPatientGender}>
-                    <SelectTrigger className="h-9 text-xs bg-background/60">
+                    <SelectTrigger className="h-9 text-xs bg-background/60 border-border/70 rounded-xl">
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
@@ -278,21 +285,21 @@ export default function UploadPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="hospitalName" className="text-xs font-semibold text-foreground">
-                  Medical Facility / Hospital
+                <Label htmlFor="hospitalName" className="text-xs font-bold text-foreground">
+                  Hospital / Clinical Facility
                 </Label>
                 <Input
                   id="hospitalName"
                   placeholder="e.g. NeuroScan Medical Center"
                   value={hospitalName}
                   onChange={(e) => setHospitalName(e.target.value)}
-                  className="h-9 text-xs bg-background/60"
+                  className="h-9 text-xs bg-background/60 border-border/70 rounded-xl"
                   data-testid="input-hospital-name"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="patientPhone" className="text-xs font-semibold text-foreground">
+                <Label htmlFor="patientPhone" className="text-xs font-bold text-foreground">
                   Contact Phone (Optional)
                 </Label>
                 <Input
@@ -300,7 +307,7 @@ export default function UploadPage() {
                   placeholder="e.g. +1 (555) 234-5678"
                   value={patientPhoneNumber}
                   onChange={(e) => setPatientPhoneNumber(e.target.value)}
-                  className="h-9 text-xs bg-background/60"
+                  className="h-9 text-xs bg-background/60 border-border/70 rounded-xl font-mono"
                   data-testid="input-patient-phone"
                 />
               </div>
@@ -308,29 +315,29 @@ export default function UploadPage() {
           </Card>
         </div>
 
-        {/* Right Column: Scan Upload & Submission */}
+        {/* Right Column: Scan Upload & Pipeline Trigger */}
         <div className="lg:col-span-7 space-y-6">
-          <Card className="border-border/60 bg-card/60 backdrop-blur-sm">
-            <CardHeader className="pb-4 border-b border-border/60">
+          <Card className="border-border/70 bg-card/75 backdrop-blur-xl shadow-xl">
+            <CardHeader className="pb-3 border-b border-border/60">
               <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                <ScanLine className="h-4 w-4 text-cyan-500" />
-                Brain MRI Acquisition Upload
+                <ScanLine className="h-4 w-4 text-cyan-400" />
+                Brain MRI Acquisition Dropzone
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Drag and drop your axial MRI slice or select a file (JPG, PNG, DICOM-derived)
+                Axial brain MRI slice (T1, T1-CE, T2, or FLAIR) in JPG, PNG, or DICOM-derived format
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-6 pt-6">
-              {/* Dropzone */}
+            <CardContent className="space-y-5 pt-5">
+              {/* Dropzone with glowing borders */}
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center min-h-[220px] ${
                   file
-                    ? "border-cyan-500/60 bg-cyan-500/5"
-                    : "border-border/80 hover:border-cyan-500/40 hover:bg-muted/30"
+                    ? "border-cyan-500/60 bg-cyan-500/5 ring-1 ring-cyan-500/20"
+                    : "border-border/80 hover:border-cyan-500/40 hover:bg-cyan-500/[0.02]"
                 }`}
                 data-testid="dropzone-mri"
               >
@@ -345,25 +352,29 @@ export default function UploadPage() {
 
                 {previewUrl ? (
                   <div className="space-y-3 flex flex-col items-center">
-                    <div className="relative h-36 w-36 rounded-xl overflow-hidden border border-cyan-500/40 shadow-lg shadow-cyan-500/10">
+                    <div className="relative h-40 w-40 rounded-xl overflow-hidden border border-cyan-500/40 shadow-xl shadow-cyan-950/30 ring-1 ring-white/10">
                       <img src={previewUrl} alt="MRI Scan Preview" className="h-full w-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+                      <Badge className="absolute bottom-2 left-2 text-[10px] font-mono bg-slate-950/80 text-cyan-400 border-cyan-500/30">
+                        VERIFIED
+                      </Badge>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-foreground">{file?.name}</p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {file ? `${(file.size / 1024).toFixed(1)} KB` : ""} • Click to change image
+                      <p className="text-xs font-bold text-foreground font-mono">{file?.name}</p>
+                      <p className="text-[11px] text-muted-foreground font-mono">
+                        {file ? `${(file.size / 1024).toFixed(1)} KB` : ""} • Click to change file
                       </p>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-3 flex flex-col items-center">
-                    <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center">
+                    <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center ring-1 ring-cyan-500/20">
                       <UploadIcon className="h-7 w-7 animate-bounce" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-foreground">Click or Drag & Drop Brain MRI Scan</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        High-resolution axial slices (T1, T2, FLAIR) up to 50MB
+                      <p className="text-sm font-bold text-foreground">Click to Browse or Drag & Drop Brain MRI Scan</p>
+                      <p className="text-xs text-muted-foreground mt-1 font-mono">
+                        High-resolution axial slices up to 50MB (JPG, PNG)
                       </p>
                     </div>
                   </div>
@@ -372,18 +383,18 @@ export default function UploadPage() {
 
               {/* Quality & Preprocessing Notice */}
               <div className="p-3.5 rounded-xl bg-muted/40 border border-border/60 flex items-start gap-3 text-xs text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-cyan-500 shrink-0 mt-0.5" />
-                <span>
-                  The image tensor will be preprocessed to 224x224 pixels and evaluated across the
-                  trained hybrid CNN-ViT classifier with Monte Carlo Dropout uncertainty and Attention U-Net segmentation.
+                <ShieldCheck className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">
+                  Image tensor will be preprocessed to 224x224 and screened via the dual-branch CNN-ViT model
+                  with 50 Monte Carlo stochastic passes and Attention U-Net lesion delineation.
                 </span>
               </div>
 
-              {/* Submit CTA */}
+              {/* Submit CTA Button */}
               <Button
                 type="submit"
                 disabled={!file || uploadMutation.isPending}
-                className="w-full h-12 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 rounded-xl transition-all"
+                className="w-full h-12 bg-gradient-to-r from-cyan-500 via-teal-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-sm shadow-xl shadow-cyan-500/25 rounded-xl transition-all hover:scale-[1.01]"
                 data-testid="button-start-analysis"
               >
                 <Brain className="h-5 w-5 mr-2" />
@@ -396,37 +407,39 @@ export default function UploadPage() {
 
       {/* ─── Processing Animation Modal ──────────────────────────────── */}
       <Dialog open={isProcessing} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-lg border-border/80 bg-slate-950 text-slate-100 p-6 rounded-2xl shadow-2xl [&>button]:hidden">
+        <DialogContent className="sm:max-w-lg border-white/10 bg-slate-950 text-slate-100 p-6 rounded-2xl shadow-2xl [&>button]:hidden">
           <DialogHeader className="space-y-1.5 pb-2">
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-cyan-400 animate-ping" />
-              <DialogTitle className="text-lg font-bold text-white">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
+              </span>
+              <DialogTitle className="text-lg font-bold text-white font-mono">
                 Executing NeuroScan AI Pipeline
               </DialogTitle>
             </div>
-            <DialogDescription className="text-xs text-slate-400">
-              Performing multi-stage neural computation and biomarker extraction
+            <DialogDescription className="text-xs text-slate-400 font-mono">
+              Performing multi-stage neural computation and radiomic biomarker extraction
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6 pt-2">
+          <div className="space-y-5 pt-2">
             {/* Progress Bar */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 font-mono">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-cyan-400">
                   Stage {currentStage} of {STAGES.length}
                 </span>
-                <span className="text-slate-400 font-mono">{progressValue}%</span>
+                <span className="text-slate-400">{progressValue}%</span>
               </div>
-              <Progress value={progressValue} className="h-2 bg-slate-800" />
+              <Progress value={progressValue} className="h-2 bg-slate-900 border border-slate-800" />
             </div>
 
             {/* Stages Timeline */}
-            <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
               {STAGES.map((s) => {
                 const isPast = s.id < currentStage;
                 const isCurrent = s.id === currentStage;
-                const isFuture = s.id > currentStage;
                 const IconComponent = s.icon;
 
                 return (
@@ -434,7 +447,7 @@ export default function UploadPage() {
                     key={s.id}
                     className={`flex items-start gap-3 p-2.5 rounded-xl border transition-all ${
                       isCurrent
-                        ? "bg-cyan-950/50 border-cyan-500/50 shadow-sm"
+                        ? "bg-cyan-950/60 border-cyan-500/50 shadow-sm"
                         : isPast
                         ? "bg-slate-900/40 border-slate-800/80 opacity-90"
                         : "border-transparent opacity-40"
@@ -466,7 +479,7 @@ export default function UploadPage() {
                       >
                         {s.label}
                       </p>
-                      <p className="text-[11px] text-slate-400 leading-tight truncate">{s.detail}</p>
+                      <p className="text-[11px] text-slate-400 leading-tight truncate font-mono">{s.detail}</p>
                     </div>
                   </div>
                 );

@@ -145,38 +145,53 @@ function UserMenu() {
 function AuthenticatedContent() {
   const { user } = useAuth();
   const style = {
-    "--sidebar-width": "17rem",
-    "--sidebar-width-icon": "3.5rem",
+    "--sidebar-width": "17.5rem",
+    "--sidebar-width-icon": "3.75rem",
   };
 
   const userRole = user?.role || "doctor";
 
   return (
     <SidebarProvider style={style as React.CSSProperties}>
-      <div className="flex h-screen w-full bg-background overflow-hidden">
+      <div className="flex h-screen w-full bg-background overflow-hidden selection:bg-cyan-500 selection:text-white">
         <AppSidebar />
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-          {/* Top Clinical Header */}
-          <header className="flex items-center justify-between px-6 py-3 border-b border-border/60 bg-card/40 backdrop-blur-md shrink-0">
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-background">
+          {/* Top Clinical Radiology HUD Header */}
+          <header className="flex items-center justify-between px-4 sm:px-6 py-2.5 border-b border-border/70 bg-card/60 backdrop-blur-xl shrink-0 z-20">
             <div className="flex items-center gap-3">
-              <SidebarTrigger data-testid="button-sidebar-toggle" />
+              <SidebarTrigger data-testid="button-sidebar-toggle" className="hover:bg-cyan-500/10 hover:text-cyan-400 transition-colors" />
               <div className="h-4 w-px bg-border/80 hidden sm:block" />
-              <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                <span>Hospital Network:</span>
-                <Badge variant="outline" className="text-[11px] font-mono text-cyan-500 border-cyan-500/20">
+              
+              <div className="hidden sm:flex items-center gap-2 text-xs font-medium">
+                <span className="text-muted-foreground">Workstation:</span>
+                <Badge variant="outline" className="text-[11px] font-mono text-cyan-400 bg-cyan-500/10 border-cyan-500/30 flex items-center gap-1.5 px-2 py-0.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                  </span>
                   NeuroScan Medical Center
+                </Badge>
+              </div>
+
+              <div className="hidden md:flex items-center gap-2 pl-2">
+                <Badge variant="outline" className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border-emerald-500/20 px-2 py-0.5">
+                  AI Pipeline Online (CNN-ViT + Attention U-Net)
                 </Badge>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono text-muted-foreground bg-muted/40 px-2.5 py-1 rounded-md border border-border/50">
+                <Activity className="h-3 w-3 text-cyan-400" />
+                <span>PACS DICOM Sync: Active</span>
+              </div>
               <ThemeToggle />
               <UserMenu />
             </div>
           </header>
 
           {/* Main Workspace Content Area */}
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-b from-background via-background to-card/20">
             <MainRouter role={userRole} />
           </main>
         </div>

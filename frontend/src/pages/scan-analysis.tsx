@@ -39,9 +39,9 @@ import {
 import type { Scan, DiagnosticReport } from "@shared/schema";
 
 export default function ScanAnalysis() {
-  const [, params] = useRoute("/scan/:id");
+  const [, params] = useRoute<{ id: string }>("/scan/:id");
   const [, setLocation] = useLocation();
-  const scanId = params?.id;
+  const scanId = params?.id || "";
   const { toast } = useToast();
 
   const [activeViewMode, setActiveViewMode] = useState<"segmentation" | "gradcam" | "gradcam_plus" | "ig" | "raw">("segmentation");
@@ -165,51 +165,53 @@ export default function ScanAnalysis() {
   const faithfulness = ana?.xai?.faithfulness;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* ─── Top Header Bar ────────────────────────────────────────────── */}
-      <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-cyan-950/40 border border-border/80 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
-        <div className="flex items-center gap-4">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* ─── Top Clinical Header Bar ────────────────────────────────────────────── */}
+      <div className="rounded-2xl bg-card/75 backdrop-blur-2xl border border-white/[0.08] p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl shadow-cyan-950/20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-32 bg-cyan-500/5 blur-3xl pointer-events-none rounded-full" />
+        
+        <div className="flex items-center gap-4 relative z-10">
           <Button
             variant="outline"
             size="icon"
             onClick={() => setLocation("/")}
-            className="h-10 w-10 shrink-0 border-border/80"
+            className="h-10 w-10 shrink-0 border-border/70 hover:bg-cyan-500/10 hover:text-cyan-400 transition-colors"
             data-testid="button-back-dashboard"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
 
           <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-foreground" data-testid="text-patient-name">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground" data-testid="text-patient-name">
                 {scan.patientName}
               </h1>
-              <Badge variant="outline" className="text-xs font-mono text-cyan-400 border-cyan-500/30">
-                {scan.patientCode || scan.id.slice(0, 8)}
+              <Badge variant="outline" className="text-xs font-mono text-cyan-400 bg-cyan-500/10 border-cyan-500/30 px-2 py-0.5">
+                MRN: {scan.patientCode || scan.id.slice(0, 8)}
               </Badge>
               {ana?.isArchived && (
-                <Badge variant="secondary" className="text-[10px]">
-                  Archived
+                <Badge variant="secondary" className="text-[10px] bg-muted font-mono">
+                  ARCHIVED
                 </Badge>
               )}
             </div>
-            <p className="text-xs text-muted-foreground flex items-center gap-3">
+            <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-2.5 font-mono">
               <span>{scan.patientAge ? `Age: ${scan.patientAge}` : "Age: N/A"}</span>
               <span>•</span>
               <span>{scan.patientGender || "Gender: Unspecified"}</span>
               <span>•</span>
-              <span>{scan.hospitalName || "NeuroScan Medical Center"}</span>
+              <span className="text-foreground/80">{scan.hospitalName || "NeuroScan Medical Center"}</span>
               <span>•</span>
-              <span>Acquisition: {scan.uploadedAt ? new Date(scan.uploadedAt).toLocaleString() : "Recent"}</span>
+              <span>Acquisition: {scan.uploadedAt ? new Date(scan.uploadedAt).toLocaleDateString() : "Recent"}</span>
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Button variant="outline" size="sm" onClick={handleShare} className="h-9" data-testid="button-share-analysis">
-            {isShared ? <Check className="h-4 w-4 mr-1.5 text-emerald-500" /> : <Share2 className="h-4 w-4 mr-1.5" />}
-            {isShared ? "Copied" : "Share"}
+        <div className="flex flex-wrap items-center gap-2.5 relative z-10">
+          <Button variant="outline" size="sm" onClick={handleShare} className="h-9 hover:bg-cyan-500/10 hover:text-cyan-400 border-border/70" data-testid="button-share-analysis">
+            {isShared ? <Check className="h-4 w-4 mr-1.5 text-emerald-400" /> : <Share2 className="h-4 w-4 mr-1.5" />}
+            {isShared ? "Link Copied" : "Share"}
           </Button>
 
           <Button
@@ -217,7 +219,7 @@ export default function ScanAnalysis() {
             size="sm"
             onClick={() => archiveMutation.mutate()}
             disabled={archiveMutation.isPending}
-            className="h-9"
+            className="h-9 hover:bg-muted border-border/70"
             data-testid="button-archive-analysis"
           >
             <Archive className="h-4 w-4 mr-1.5" />
@@ -225,7 +227,7 @@ export default function ScanAnalysis() {
           </Button>
 
           <Link href={`/report/${scan.id}`}>
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold h-9 shadow-md shadow-cyan-500/20" data-testid="button-view-full-report">
+            <Button className="bg-gradient-to-r from-cyan-500 via-teal-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold h-9 shadow-lg shadow-cyan-500/25 px-4 rounded-xl" data-testid="button-view-full-report">
               <FileText className="h-4 w-4 mr-1.5" />
               Full Radiology Report
             </Button>
@@ -236,92 +238,92 @@ export default function ScanAnalysis() {
       {/* ─── Diagnostic KPI Summary Cards ──────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Tumor Classification */}
-        <Card className={`border-l-4 shadow-md bg-card/70 backdrop-blur-sm ${isTumor ? "border-l-red-500" : "border-l-emerald-500"}`}>
+        <Card className={`relative overflow-hidden border-l-4 shadow-xl bg-card/75 backdrop-blur-xl transition-all hover:border-border ${isTumor ? "border-l-rose-500 shadow-rose-950/10" : "border-l-emerald-500 shadow-emerald-950/10"}`}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Primary AI Classification
+            <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">
+              Primary Pathology Detection
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className={`text-xl sm:text-2xl font-black ${isTumor ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`} data-testid="text-tumor-type">
-              {scan.tumorType || (isTumor ? "Tumor Detected" : "No Tumor")}
+            <div className={`text-xl sm:text-2xl font-black tracking-tight ${isTumor ? "text-rose-500" : "text-emerald-400"}`} data-testid="text-tumor-type">
+              {scan.tumorType || (isTumor ? "Tumor Detected" : "No Focal Tumor")}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Architecture: {ana?.model_variant || "CNN-ViT Hybrid"}
+            <p className="text-[11px] text-muted-foreground font-mono">
+              Model: {ana?.model_variant || "CNN-ViT Hybrid Dual-Branch"}
             </p>
           </CardContent>
         </Card>
 
         {/* Softmax Confidence */}
-        <Card className="border-l-4 border-l-cyan-500 shadow-md bg-card/70 backdrop-blur-sm">
+        <Card className="border-l-4 border-l-cyan-500 shadow-xl bg-card/75 backdrop-blur-xl shadow-cyan-950/10">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Model Confidence
+            <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">
+              Softmax Confidence
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-extrabold text-cyan-500 font-mono" data-testid="text-confidence-score">
+            <div className="text-2xl sm:text-3xl font-black text-cyan-400 font-mono tracking-tight" data-testid="text-confidence-score">
               {confidencePct}%
             </div>
-            <p className="text-xs text-muted-foreground">
-              Primary class softmax probability
+            <p className="text-[11px] text-muted-foreground">
+              Primary class calibrated probability
             </p>
           </CardContent>
         </Card>
 
         {/* MC-Dropout Uncertainty */}
-        <Card className="border-l-4 border-l-blue-500 shadow-md bg-card/70 backdrop-blur-sm">
+        <Card className="border-l-4 border-l-blue-500 shadow-xl bg-card/75 backdrop-blur-xl shadow-blue-950/10">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Bayesian Uncertainty
+            <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">
+              MC-Dropout Uncertainty
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-blue-400 font-mono">
+              <span className="text-2xl sm:text-3xl font-black text-blue-400 font-mono tracking-tight">
                 {uncertaintyPct}%
               </span>
               <Badge
                 variant="outline"
-                className={
+                className={`font-mono text-[10px] px-2 py-0.5 ${
                   uncertaintyTier === "LOW"
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]"
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                     : uncertaintyTier === "HIGH"
-                    ? "bg-red-500/10 text-red-400 border-red-500/20 text-[10px]"
-                    : "bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]"
-                }
+                    ? "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                    : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                }`}
               >
                 {uncertaintyTier} TIER
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {ana?.entropy ? `Entropy: ${ana.entropy.toFixed(3)} nats` : "50 stochastic passes"}
+            <p className="text-[11px] text-muted-foreground font-mono">
+              {ana?.entropy ? `Entropy: ${ana.entropy.toFixed(3)} nats (50 passes)` : "50 stochastic MC passes"}
             </p>
           </CardContent>
         </Card>
 
         {/* Risk Stratification */}
-        <Card className={`border-l-4 shadow-md bg-card/70 backdrop-blur-sm ${riskLevel === "HIGH" ? "border-l-red-500" : riskLevel === "MEDIUM" ? "border-l-amber-500" : "border-l-emerald-500"}`}>
+        <Card className={`border-l-4 shadow-xl bg-card/75 backdrop-blur-xl ${riskLevel === "HIGH" ? "border-l-rose-500 shadow-rose-950/10" : riskLevel === "MEDIUM" ? "border-l-amber-500 shadow-amber-950/10" : "border-l-emerald-500 shadow-emerald-950/10"}`}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Clinical Risk Level
+            <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">
+              Clinical Risk Stratum
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
             <div className="flex items-baseline gap-2">
               <span
-                className={`text-2xl sm:text-3xl font-black ${
-                  riskLevel === "HIGH" ? "text-red-500" : riskLevel === "MEDIUM" ? "text-amber-500" : "text-emerald-500"
+                className={`text-2xl sm:text-3xl font-black tracking-tight ${
+                  riskLevel === "HIGH" ? "text-rose-500" : riskLevel === "MEDIUM" ? "text-amber-400" : "text-emerald-400"
                 }`}
               >
                 {riskLevel}
               </span>
               <span className="text-xs text-muted-foreground font-mono">
-                Score: {riskScore.toFixed(2)}/1.0
+                Index: {riskScore.toFixed(2)}/1.0
               </span>
             </div>
-            <p className="text-xs text-muted-foreground truncate">
-              {ana?.risk_recommendation || (riskLevel === "HIGH" ? "Urgent specialist review advised" : "Routine correlation")}
+            <p className="text-[11px] text-muted-foreground truncate">
+              {ana?.risk_recommendation || (riskLevel === "HIGH" ? "Urgent multidisciplinary review" : "Routine clinical correlation")}
             </p>
           </CardContent>
         </Card>
