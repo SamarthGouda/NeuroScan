@@ -1,0 +1,15 @@
+{
+  "resnet50_only": {
+    "best_val_auc": 0.9991628873771731
+  },
+  "swin_only": {
+    "best_val_auc": 0.9998488284202569
+  },
+  "concat_no_attn": {
+    "best_val_auc": 0.9999433106575963
+  },
+  "hybrid": {
+    "best_val_auc": 0.9998318216175359
+  },
+  "best_model": "concat_no_attn"
+}
