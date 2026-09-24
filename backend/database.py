@@ -14,6 +14,7 @@ Tables:
 import uuid
 import json
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import (
     Column, String, Float, Integer, Boolean, Text, DateTime, ForeignKey, create_engine, desc
@@ -25,9 +26,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from config import DATABASE_URL
 
+connect_args = {}
+engine_kwargs = {}
+
+if DATABASE_URL.startswith("sqlite"):
+    connect_args["check_same_thread"] = False
+else:
+    engine_kwargs["pool_pre_ping"] = True
+    engine_kwargs["pool_size"] = 10
+    engine_kwargs["max_overflow"] = 20
+
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},
+    connect_args=connect_args,
+    **engine_kwargs,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -201,6 +213,65 @@ class AuditLog(Base):
     ip_address    = Column(String(50), nullable=True)
     user_agent    = Column(String(255), nullable=True)
     timestamp     = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id          = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id     = Column(String, ForeignKey("users.id"), nullable=True, index=True)  # Targeted user or None for role broadcast
+    target_role = Column(String(20), nullable=True, index=True)  # doctor | technician | admin | None (all)
+    title       = Column(String(150), nullable=False)
+    message     = Column(Text, nullable=False)
+    type        = Column(String(30), default="info")             # info | success | warning | urgent
+    link        = Column(String(255), nullable=True)
+    is_read     = Column(Boolean, default=False, nullable=False, index=True)
+    created_at  = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class EmailOTP(Base):
+    __tablename__ = "email_otps"
+
+    id         = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    email      = Column(String(120), nullable=False, index=True)
+    otp_hash   = Column(String(255), nullable=False)
+    purpose    = Column(String(30), default="login")             # login | register | reset_password
+    attempts   = Column(Integer, default=0, nullable=False)
+    is_used    = Column(Boolean, default=False, nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+def create_notification(
+    db: Session,
+    title: str,
+    message: str,
+    type: str = "info",
+    target_role: Optional[str] = None,
+    user_id: Optional[str] = None,
+    link: Optional[str] = None,
+) -> Notification:
+    """Helper to dispatch in-app notifications to users or specific clinical roles."""
+    try:
+        notif = Notification(
+            user_id=user_id,
+            target_role=target_role,
+            title=title,
+            message=message,
+            type=type,
+            link=link,
+            is_read=False,
+            created_at=datetime.utcnow(),
+        )
+        db.add(notif)
+        db.commit()
+        db.refresh(notif)
+        return notif
+    except Exception as e:
+        print(f"[Notification] Failed to create notification: {e}")
+        db.rollback()
+        return None
+
 
 
 # ─── Initialization & Seeding ─────────────────────────────────────────────────

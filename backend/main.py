@@ -27,8 +27,9 @@ mimetypes.add_type("image/svg+xml", ".svg")
 mimetypes.add_type("text/html", ".html")
 mimetypes.add_type("application/json", ".json")
 
-from database import create_tables
-from config import CORS_ORIGINS, BASE_DIR
+from sqlalchemy import text
+from database import create_tables, SessionLocal
+from config import CORS_ORIGINS, BASE_DIR, ENVIRONMENT, DATABASE_URL
 
 # Routers
 from api.routes_auth import router as auth_router
@@ -40,6 +41,7 @@ from api.routes_cases import router as cases_router
 from api.routes_reports import router as reports_router
 from api.routes_audit import router as audit_router
 from api.routes_stats import router as stats_router
+from api.routes_notifications import router as notifications_router
 
 
 # ─── Lifespan (Startup / Shutdown) ───────────────────────────────────────────
@@ -73,44 +75,83 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="NEUROSCAN AI API",
     description="Explainable Brain MRI Tumor Detection, Segmentation, Radiomics & Clinical Decision Support",
-    version="3.0.0",
+    version="3.0.4",
     lifespan=lifespan,
 )
 
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS + ["*"],
+    allow_origins=CORS_ORIGINS if CORS_ORIGINS else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ─── System Health Endpoint ───────────────────────────────────────────────────
+# ─── Production HTTP Security Headers Middleware ──────────────────────────────
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if ENVIRONMENT == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
+# ─── System Health Endpoints ──────────────────────────────────────────────────
+
+@app.get("/health", tags=["Health"])
 @app.get("/api/health", tags=["Health"])
 async def health_check():
+    """
+    Comprehensive, unauthenticated health check endpoint for monitoring,
+    load balancers, and container orchestration probes.
+    """
+    db_status = "connected"
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+    except Exception as e:
+        db_status = f"unhealthy: {type(e).__name__}"
+
+    ml_ready = bool(getattr(app.state, "predictor", None) is not None)
+    ml_variant = getattr(app.state.predictor, "model_variant", "none") if ml_ready else "offline"
+
+    overall_status = "healthy" if (db_status == "connected" and ml_ready) else "degraded"
+
     return {
-        "status": "online",
-        "application": "NEUROSCAN AI",
-        "version": "3.0.0",
-        "architecture": "CNN-ViT Hybrid (ResNet50 + Swin-Tiny)",
-        "segmentation": "Attention U-Net",
-        "explainability": "Grad-CAM, Grad-CAM++, Integrated Gradients",
-        "database": "SQLite (neurovision.db)",
+        "status": overall_status,
+        "application": "NEUROVISION AI",
+        "version": "3.0.4",
+        "environment": ENVIRONMENT,
+        "database": {
+            "status": db_status,
+            "engine": "sqlite" if DATABASE_URL.startswith("sqlite") else "postgresql",
+        },
+        "ml_inference": {
+            "status": "ready" if ml_ready else "not_loaded",
+            "model_variant": ml_variant,
+            "architecture": "CNN-ViT Hybrid + Attention U-Net",
+            "explainability": "Grad-CAM, Grad-CAM++, Integrated Gradients",
+        },
     }
 
 # ─── Mount API Routers ─────────────────────────────────────────────────────────
 
-app.include_router(auth_router,     prefix="/api/auth")
-app.include_router(users_router,    prefix="/api")
-app.include_router(patients_router, prefix="/api")
-app.include_router(scans_router,    prefix="/api")
-app.include_router(predict_router,  prefix="/api")
-app.include_router(cases_router,    prefix="/api")
-app.include_router(reports_router,  prefix="/api")
-app.include_router(audit_router,    prefix="/api")
-app.include_router(stats_router,    prefix="/api")
+app.include_router(auth_router,          prefix="/api/auth")
+app.include_router(users_router,         prefix="/api")
+app.include_router(patients_router,      prefix="/api")
+app.include_router(scans_router,         prefix="/api")
+app.include_router(predict_router,       prefix="/api")
+app.include_router(cases_router,         prefix="/api")
+app.include_router(reports_router,       prefix="/api")
+app.include_router(audit_router,         prefix="/api")
+app.include_router(stats_router,         prefix="/api")
+app.include_router(notifications_router, prefix="/api")
 
 # Mount Uploads directory
 UPLOADS_DIR = BASE_DIR / "uploads"

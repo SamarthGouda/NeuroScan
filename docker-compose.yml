@@ -1,0 +1,52 @@
+services:
+  neurovision-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: neurovision_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - PORT=8000
+      - HOST=0.0.0.0
+      - NEUROSCAN_AUTH_SECRET=${NEUROSCAN_AUTH_SECRET:-production_secure_token_secret_key_2026}
+      - JWT_SECRET=${JWT_SECRET:-production_secure_token_secret_key_2026}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/neurovision.db}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:8000,http://localhost:5173}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./saved_models:/app/saved_models
+      - ./neurovision.db:/app/neurovision.db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional PostgreSQL database service for high-concurrency production deployments
+  # Run with: docker compose --profile with-postgres up -d
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: neurovision_postgres
+    restart: unless-stopped
+    profiles: ["with-postgres"]
+    environment:
+      POSTGRES_DB: neurovision_db
+      POSTGRES_USER: neurovision
+      POSTGRES_PASSWORD: neurovision_secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

@@ -13,9 +13,10 @@ import time
 import json
 from pathlib import Path
 
-from database import get_db, Scan, Analysis, Patient, User
+from database import get_db, Scan, Analysis, Patient, User, create_notification
 from auth import get_optional_user, log_audit_event
-from config import BASE_DIR
+from config import BASE_DIR, MAX_UPLOAD_SIZE_BYTES, ALLOWED_IMAGE_EXTENSIONS
+from api.routes_scans import validate_image_security
 
 router = APIRouter()
 
@@ -38,10 +39,9 @@ async def predict(
     if predictor is None:
         raise HTTPException(status_code=503, detail="ML Model predictor is not loaded.")
 
-    if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be a valid image.")
-
     contents = await file.read()
+    validate_image_security(contents, file.filename or "scan.jpg")
+
     try:
         image = Image.open(BytesIO(contents)).convert("RGB")
     except Exception:
@@ -126,6 +126,15 @@ async def predict(
         )
         db.add(analysis_row)
         db.commit()
+
+        create_notification(
+            db=db,
+            title="MRI Analysis Completed",
+            message=f"Direct analysis completed: {result['tumor_type']} ({result['confidence']*100:.1f}% confidence)",
+            type="urgent" if result.get("risk_level") == "HIGH" else "success",
+            target_role="doctor",
+            link=f"/scan/{scan_row.id}",
+        )
 
         log_audit_event(
             db=db,

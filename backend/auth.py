@@ -25,13 +25,48 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from database import get_db, User, AuditLog
 
-AUTH_SECRET = os.environ.get("NEUROSCAN_AUTH_SECRET", "neuroscan_ai_clinical_secure_token_secret_2026_key")
-TOKEN_EXPIRY_SECONDS = 86400 * 7  # 7 days
+from config import AUTH_SECRET, TOKEN_EXPIRY_SECONDS, IS_PRODUCTION
 
 security_bearer = HTTPBearer(auto_error=False)
 
+# In-memory sliding window rate limiter: {key: [timestamp, timestamp, ...]}
+_RATE_LIMIT_STORE: dict[str, list[float]] = {}
 
-# ─── Password Hashing ─────────────────────────────────────────────────────────
+
+def check_rate_limit(key: str, max_requests: int = 5, window_seconds: int = 300) -> bool:
+    """
+    Returns True if request is allowed, False if rate limited.
+    Cleans up timestamps older than window_seconds.
+    """
+    now = time.time()
+    timestamps = _RATE_LIMIT_STORE.get(key, [])
+    # Filter only timestamps within window
+    timestamps = [t for t in timestamps if now - t < window_seconds]
+    if len(timestamps) >= max_requests:
+        _RATE_LIMIT_STORE[key] = timestamps
+        return False
+    timestamps.append(now)
+    _RATE_LIMIT_STORE[key] = timestamps
+    return True
+
+
+# ─── Password Strength & Hashing ──────────────────────────────────────────────
+
+def validate_password_strength(password: str) -> Optional[str]:
+    """
+    Enforces production password standards:
+    - Minimum 8 characters
+    - At least one letter
+    - At least one digit
+    """
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+    if not any(c.isalpha() for c in password):
+        return "Password must contain at least one letter."
+    if not any(c.isdigit() for c in password):
+        return "Password must contain at least one number."
+    return None
+
 
 def hash_password(password: str) -> str:
     """Hash password using PBKDF2-HMAC-SHA256 with 100,000 iterations and salt."""
@@ -43,7 +78,6 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against stored salt and PBKDF2 hash."""
     try:
-        # Fallback for legacy plain text passwords during migration if any
         if ":" not in hashed_password:
             return plain_password == hashed_password
 
@@ -54,6 +88,27 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return hmac.compare_digest(key, expected_key)
     except Exception:
         return False
+
+
+# ─── OTP Utilities ────────────────────────────────────────────────────────────
+
+def generate_secure_otp(length: int = 6) -> str:
+    """Cryptographically secure numeric OTP."""
+    import secrets
+    return "".join(secrets.choice("0123456789") for _ in range(length))
+
+
+def hash_otp(otp: str) -> str:
+    """Hash OTP using SHA-256 with server auth secret salt."""
+    salted = f"{AUTH_SECRET}:{otp}"
+    return hashlib.sha256(salted.encode()).hexdigest()
+
+
+def verify_otp(plain_otp: str, hashed_otp: str) -> bool:
+    """Timing-attack-safe OTP verification."""
+    expected = hash_otp(plain_otp)
+    return hmac.compare_digest(expected, hashed_otp)
+
 
 
 # ─── Token Generation & Verification ──────────────────────────────────────────

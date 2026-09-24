@@ -18,9 +18,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from PIL import Image
 
-from database import get_db, Patient, Scan, Analysis, Case, DiagnosticReport, User
+from database import get_db, Patient, Scan, Analysis, Case, DiagnosticReport, User, create_notification
 from auth import get_current_user, get_optional_user, log_audit_event
-from config import BASE_DIR, CLASS_DISPLAY
+from config import BASE_DIR, CLASS_DISPLAY, MAX_UPLOAD_SIZE_BYTES, ALLOWED_IMAGE_EXTENSIONS
 
 router = APIRouter()
 
@@ -28,8 +28,45 @@ UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
 
 
+def validate_image_security(contents: bytes, filename: str) -> None:
+    """
+    Validates uploaded medical scan integrity:
+      - Max file size enforcement
+      - Extension whitelist
+      - Magic byte signature validation
+    """
+    if len(contents) > MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File exceeds maximum allowed upload size of {MAX_UPLOAD_SIZE_BYTES // (1024*1024)}MB."
+        )
+
+    ext = Path(filename).suffix.lower() if filename else ".jpg"
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported file format '{ext}'. Allowed medical image extensions: {', '.join(sorted(ALLOWED_IMAGE_EXTENSIONS))}"
+        )
+
+    # Magic bytes check
+    is_valid_magic = (
+        contents.startswith(b"\xff\xd8\xff") or          # JPEG
+        contents.startswith(b"\x89PNG\r\n\x1a\n") or      # PNG
+        contents.startswith(b"BM") or                    # BMP
+        contents.startswith(b"RIFF") or                  # WEBP
+        contents.startswith(b"II*\x00") or               # TIFF little-endian
+        contents.startswith(b"MM\x00*")                  # TIFF big-endian
+    )
+    if not is_valid_magic:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File integrity check failed: file header does not match a valid medical image format."
+        )
+
+
 def get_predictor(request: Request):
     return request.app.state.predictor
+
 
 
 def _format_scan_detail(scan: Scan) -> dict:
@@ -136,13 +173,9 @@ async def upload_and_analyze_scan(
     if predictor is None:
         raise HTTPException(status_code=503, detail="ML Model predictor is initializing. Please retry in a few seconds.")
 
-    # 1. Validate file
-    if not scan.content_type or not scan.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Invalid file type. Please upload a valid brain MRI image (JPG/PNG).")
-
+    # 1. Validate file with security checks (magic bytes, size, ext)
     contents = await scan.read()
-    if len(contents) > 50 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="File too large. Maximum supported scan size is 50MB.")
+    validate_image_security(contents, scan.filename or "scan.jpg")
 
     try:
         image = Image.open(BytesIO(contents)).convert("RGB")
@@ -295,7 +328,36 @@ async def upload_and_analyze_scan(
     db.add(report_record)
     db.commit()
 
-    # 9. Audit log
+    # 9. Trigger In-App Clinical Notifications
+    create_notification(
+        db=db,
+        title="Analysis Completed",
+        message=f"Analysis completed for Patient ID {patient.patient_code} ({patient.full_name}): {result['tumor_type']} ({result['confidence']*100:.1f}% confidence)",
+        type="urgent" if result["risk_level"] == "HIGH" else "success",
+        target_role="doctor",
+        link=f"/scan/{scan_record.id}",
+    )
+
+    create_notification(
+        db=db,
+        title="Diagnostic Report Available",
+        message=f"New diagnostic report is available for Case {case_record.case_number} ({patient.full_name}).",
+        type="info",
+        target_role="doctor",
+        link=f"/report/{report_record.id}",
+    )
+
+    if case_record.assigned_doctor_id:
+        create_notification(
+            db=db,
+            title="Case Assigned",
+            message=f"Case {case_record.case_number} ({patient.full_name}) has been assigned to you.",
+            type="info",
+            user_id=case_record.assigned_doctor_id,
+            link="/cases",
+        )
+
+    # 10. Audit log
     log_audit_event(
         db=db,
         action="UPLOAD_AND_ANALYZE_SCAN",

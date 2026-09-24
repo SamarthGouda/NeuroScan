@@ -10,7 +10,7 @@ from sqlalchemy import desc
 from typing import Optional, List
 import uuid
 
-from database import get_db, Patient, Scan, Case, Analysis, User
+from database import get_db, Patient, Scan, Case, Analysis, User, create_notification
 from auth import get_current_user, log_audit_event
 
 router = APIRouter()
@@ -76,9 +76,12 @@ def create_patient(
 ):
     code = req.patient_code
     if not code:
-        # Generate sequential code
+        # Generate guaranteed unique sequential code
         count = db.query(Patient).count() + 1
         code = f"PT-2026-{count:04d}"
+        while db.query(Patient).filter(Patient.patient_code == code).first():
+            count += 1
+            code = f"PT-2026-{count:04d}"
 
     existing = db.query(Patient).filter(Patient.patient_code == code).first()
     if existing:
@@ -107,6 +110,15 @@ def create_patient(
         resource_id=new_patient.id,
         details=f"Registered patient '{new_patient.full_name}' ({new_patient.patient_code})",
         request=request,
+    )
+
+    create_notification(
+        db=db,
+        title="New Patient Registered",
+        message=f"New patient registered: {new_patient.full_name} ({new_patient.patient_code})",
+        type="info",
+        target_role="doctor",
+        link="/cases",
     )
 
     return _format_patient(new_patient)
