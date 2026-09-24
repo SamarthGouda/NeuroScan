@@ -78,9 +78,9 @@ def _format_scan_detail(scan: Scan) -> dict:
                 "tumor_area_percent":   ana.segmentation_area_percent,
             },
             "features": {
-                "texture": radiomics[0]["norm_value"] if len(radiomics) > 0 else 0.5,
-                "shape":   radiomics[1]["norm_value"] if len(radiomics) > 1 else 0.5,
-                "intensity": radiomics[2]["norm_value"] if len(radiomics) > 2 else 0.5,
+                "texture": float(radiomics[0].get("norm_value", radiomics[0].get("value", 0.5))) if len(radiomics) > 0 and isinstance(radiomics[0], dict) else 0.5,
+                "shape":   float(radiomics[1].get("norm_value", radiomics[1].get("value", 0.5))) if len(radiomics) > 1 and isinstance(radiomics[1], dict) else 0.5,
+                "intensity": float(radiomics[2].get("norm_value", radiomics[2].get("value", 0.5))) if len(radiomics) > 2 and isinstance(radiomics[2], dict) else 0.5,
             },
             "isArchived": scan.is_archived,
         }
@@ -168,8 +168,16 @@ async def upload_and_analyze_scan(
         patient = db.query(Patient).filter((Patient.id == patientId) | (Patient.patient_code == patientId)).first()
 
     if not patient:
-        # Check if patient name exists or create new
-        patient_code = patientId or f"PT-2026-{db.query(Patient).count() + 1:04d}"
+        # Check if patient name exists or create new with guaranteed unique code
+        if patientId:
+            candidate_code = patientId
+        else:
+            p_idx = db.query(Patient).count() + 1
+            candidate_code = f"PT-2026-{p_idx:04d}"
+            while db.query(Patient).filter(Patient.patient_code == candidate_code).first():
+                p_idx += 1
+                candidate_code = f"PT-2026-{p_idx:04d}"
+        patient_code = candidate_code
         age_val = None
         if patientAge and patientAge.isdigit():
             age_val = int(patientAge)
@@ -251,7 +259,12 @@ async def upload_and_analyze_scan(
     db.add(analysis_record)
 
     # 7. Create Case record
-    case_num = f"CASE-2026-{db.query(Case).count() + 1:04d}"
+    c_idx = db.query(Case).count() + 1
+    candidate_case = f"CASE-2026-{c_idx:04d}"
+    while db.query(Case).filter(Case.case_number == candidate_case).first():
+        c_idx += 1
+        candidate_case = f"CASE-2026-{c_idx:04d}"
+    case_num = candidate_case
     priority = "urgent" if result["risk_level"] == "HIGH" else ("medium" if result["risk_level"] == "MEDIUM" else "low")
     
     case_record = Case(

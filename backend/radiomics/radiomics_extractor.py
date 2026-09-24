@@ -210,6 +210,15 @@ class RadiomicsExtractor:
         self._shap_explainer = shap.TreeExplainer(self._xgb_model)
         self._fitted = True
 
+    def extract(self, image, mask_np: np.ndarray) -> dict:
+        """
+        Predictor pipeline compatibility wrapper.
+        Accepts PIL Image or numpy array and returns {'features': [...]}.
+        """
+        image_np = np.asarray(image)
+        features = self.extract_features(image_np, mask_np)
+        return {"features": features}
+
     def extract_features(self, image_np: np.ndarray, mask_np: np.ndarray) -> list[dict]:
         """
         Extract radiomics features and return top 10 with SHAP importance.
@@ -263,11 +272,14 @@ class RadiomicsExtractor:
             direction = "up" if raw_val >= 0 else "down"
             results.append({
                 "name": name,
+                "raw_name": name,
                 "value": float(values_norm[i]),
+                "norm_value": float(values_norm[i]),
                 "raw_value": float(raw_val),
                 "shap": round(shap_val, 4),
                 "direction": direction,
                 "medical_meaning": FEATURE_MEDICAL_MEANING.get(name, ""),
+                "description": FEATURE_MEDICAL_MEANING.get(name, ""),
             })
 
         # Sort by SHAP importance descending, return top 10
@@ -280,11 +292,14 @@ class RadiomicsExtractor:
         return [
             {
                 "name": n,
+                "raw_name": n,
                 "value": 0.0,
+                "norm_value": 0.0,
                 "raw_value": 0.0,
                 "shap": 0.0,
                 "direction": "up",
                 "medical_meaning": FEATURE_MEDICAL_MEANING.get(n, ""),
+                "description": FEATURE_MEDICAL_MEANING.get(n, ""),
             }
             for n in names
         ]
