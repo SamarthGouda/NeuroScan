@@ -202,7 +202,7 @@ function AuthenticatedContent() {
               <div className="absolute top-1/3 -right-24 w-80 h-80 bg-purple-500/[0.04] rounded-full blur-3xl animate-float-delayed" />
               <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-blue-500/[0.03] rounded-full blur-3xl animate-float" />
             </div>
-            <div className="relative z-10">
+            <div className="relative z-10 animate-in fade-in slide-in-from-bottom-1 duration-300">
               <MainRouter role={userRole} />
             </div>
           </main>
