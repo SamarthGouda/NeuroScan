@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuroScan AI — Hospital System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="image_slot.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg-2:#f4f6f8; --bg-3:#e9edf1;
+    --ink:#0f1c2e; --ink-2:#44505f; --ink-3:#6b7684;
+    --line:#d9dfe5; --line-2:#c3cbd4;
+    --blue:#0b4f8a; --blue-2:#093f6e; --blue-soft:#e7eff7;
+    --amber:#8f5b00; --amber-soft:#fbf3e2;
+    --sans:'Public Sans', Helvetica, Arial, sans-serif;
+    --mono:'JetBrains Mono', Menlo, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  p{text-wrap:pretty}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+
+  /* utility bar + nav */
+  .util{background:var(--ink);color:#c8d0da;font-size:12.5px}
+  .util .wrap{height:34px;display:flex;align-items:center;justify-content:space-between}
+  .util .mono{font-family:var(--mono);font-size:11.5px;color:#9aa6b4}
+  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+  .nav{height:68px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:36px;height:36px;background:var(--blue);border-radius:6px;display:grid;place-items:center}
+  .logo span{width:14px;height:14px;border:2.5px solid #fff;border-radius:50%}
+  .bn{font-weight:700;font-size:18px;letter-spacing:-.01em}
+  .bv{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--blue);background:var(--blue-soft);padding:2px 6px;border-radius:3px;margin-left:8px;vertical-align:2px}
+  .bs{font-size:12px;color:var(--ink-3)}
+  .nav-r{display:flex;gap:8px}
+  .btn{font-family:var(--sans);font-weight:600;font-size:14px;height:40px;padding:0 18px;border-radius:6px;display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;cursor:pointer;transition:background .15s}
+  .btn-p{background:var(--blue);color:#fff}
+  .btn-p:hover{background:var(--blue-2)}
+  .btn-s{background:#fff;color:var(--ink);border-color:var(--line-2)}
+  .btn-s:hover{background:var(--bg-2)}
+  .btn-t{color:var(--ink-2)}
+  .btn-t:hover{background:var(--bg-2)}
+  .btn-lg{height:48px;padding:0 24px;font-size:15px}
+
+  /* hero */
+  .hero{padding:72px 0 0;border-bottom:1px solid var(--line)}
+  .hero-g{display:grid;grid-template-columns:1.15fr 1fr;gap:56px;align-items:center;padding-bottom:64px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+  h1{font-size:58px;line-height:1.06;font-weight:700;letter-spacing:-.025em;margin:18px 0 22px}
+  h1 span{color:var(--blue)}
+  .lede{font-size:18px;color:var(--ink-2);line-height:1.6;max-width:600px}
+  .cta{display:flex;gap:10px;margin-top:32px}
+  .hero-img{aspect-ratio:4/3.4;background:var(--bg-3);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .hero-img image-slot{width:100%;height:100%;display:block}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+  .stat{padding:26px 28px 28px;border-left:1px solid var(--line)}
+  .stat:first-child{border-left:0;padding-left:0}
+  .stat .v{font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:14px;font-weight:600;margin-top:4px}
+  .stat .d{font-size:13px;color:var(--ink-3)}
+
+  /* sections */
+  section.s{padding:88px 0;border-bottom:1px solid var(--line)}
+  .alt{background:var(--bg-2)}
+  .sh{max-width:760px;margin-bottom:44px}
+  .tag{display:inline-block;font-size:12.5px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+  h2{font-size:38px;line-height:1.15;font-weight:700;letter-spacing:-.02em}
+  .sh p{font-size:17px;color:var(--ink-2);margin-top:14px}
+
+  /* pipeline as numbered table */
+  .flow{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .flow-row{display:grid;grid-template-columns:110px 240px 1fr;align-items:center;border-top:1px solid var(--line)}
+  .flow-row:first-child{border-top:0}
+  .flow-row > div{padding:20px 24px}
+  .flow-row .no{font-family:var(--mono);font-size:13px;color:var(--blue);font-weight:500;border-right:1px solid var(--line);height:100%;display:flex;align-items:center}
+  .flow-row .ti{font-weight:600;font-size:16px}
+  .flow-row .de{color:var(--ink-2);font-size:15px}
+  .flow-row:hover{background:var(--bg-2)}
+  .flow-h{background:var(--bg-2);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+  .flow-h > div{padding:12px 24px}
+
+  /* xai */
+  .xai-top{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:28px}
+  .xai-top .sh{margin-bottom:0}
+  .seg{display:inline-flex;background:var(--bg-3);border-radius:8px;padding:4px;gap:2px;flex-shrink:0}
+  .seg button{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink-2);background:none;border:0;padding:9px 14px;border-radius:5px;cursor:pointer}
+  .seg button[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,28,46,.12)}
+  .xai{display:grid;grid-template-columns:1fr 360px;gap:24px}
+  .viewer{background:#fff;border:1px solid var(--line);border-radius:8px}
+  .vh{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line)}
+  .vh h3{font-size:16px;font-weight:600}
+  .ok{font-size:12px;font-weight:600;color:#1d6b3a;background:#e6f2ea;padding:4px 10px;border-radius:999px}
+  .vb{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:22px}
+  .pl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}
+  .pl span{font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+  .pl b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+  .scan{aspect-ratio:1;background:#111418;border-radius:4px;overflow:hidden;position:relative}
+  .scan image-slot{width:100%;height:100%;display:block}
+  .scan .cap{position:absolute;left:8px;bottom:8px;font-family:var(--mono);font-size:10.5px;color:#d5d9de;background:rgba(17,20,24,.8);padding:3px 7px;border-radius:2px;pointer-events:none}
+  .scan .ov{display:none!important;position:absolute;inset:0}
+  .scan .ov.on{display:block!important}
+  .cards{display:flex;flex-direction:column;gap:12px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:20px 22px}
+  .card h4{font-size:15.5px;font-weight:600}
+  .card p{font-size:14px;color:var(--ink-2);margin:6px 0 14px}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding-top:12px;border-top:1px solid var(--line)}
+  .kv span{color:var(--ink-3)}
+  .kv b{font-family:var(--mono);font-weight:500;color:var(--blue)}
+
+  /* roles */
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .role{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .role-h{padding:24px 26px 20px;border-bottom:1px solid var(--line)}
+  .role-h .r{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+  .role-h h3{font-size:21px;font-weight:700;margin:10px 0 4px;letter-spacing:-.01em}
+  .role-h p{font-size:14px;color:var(--ink-3)}
+  .role ul{list-style:none;padding:8px 26px 18px}
+  .role li{font-size:14.5px;color:var(--ink-2);padding:11px 0 11px 26px;position:relative;border-top:1px solid var(--bg-3)}
+  .role li:first-child{border-top:0}
+  .role li::before{content:"";position:absolute;left:2px;top:17px;width:10px;height:6px;border-left:2px solid var(--blue);border-bottom:2px solid var(--blue);transform:rotate(-45deg)}
+  .role.doc .role-h{border-top:3px solid var(--blue)}
+  .role.tech .role-h{border-top:3px solid #4b6a85}
+  .role.adm .role-h{border-top:3px solid var(--ink)}
+
+  footer{padding:56px 0 40px}
+  .notice{display:flex;gap:18px;background:var(--amber-soft);border:1px solid #ecd9b0;border-radius:8px;padding:22px 26px}
+  .notice .ic{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:2px solid var(--amber);color:var(--amber);font-weight:700;display:grid;place-items:center;font-size:14px}
+  .notice h4{font-size:13px;font-weight:700;color:var(--amber);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+  .notice p{font-size:14.5px;color:#4d3d1f;line-height:1.6}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:36px;padding-top:24px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-3);flex-wrap:wrap;gap:12px}
+  .foot b{color:var(--ink);font-weight:700}
+  .foot .mono{font-family:var(--mono);font-size:12px}
+
+  @media (max-width:1000px){
+    .hero-g,.xai{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .roles{grid-template-columns:1fr}
+    .xai-top{flex-direction:column;align-items:flex-start}
+    .flow-row{grid-template-columns:80px 1fr}
+    .flow-row .de{grid-column:2}
+    h1{font-size:42px}
+  }
+</style>
+</head>
+<body>
+
+<div class="util"><div class="wrap"><span>Clinical decision-support platform for neuroradiology</span><span class="mono">CNN-ViT Hybrid · Attention U-Net · PyTorch 2.12</span></div></div>
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      <div>
+        <div class="bn">NeuroScan AI<span class="bv">v3.0 CLINICAL</span></div>
+        <div class="bs">Trained CNN-ViT Hybrid &amp; Attention U-Net Workstation</div>
+      </div>
+    </div>
+    <div class="nav-r">
+      <a class="btn btn-t" href="#">Sign In</a>
+      <a class="btn btn-p" href="#">Analyze MRI Scan →</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero" data-screen-label="Hero">
+  <div class="wrap">
+    <div class="hero-g">
+      <div>
+        <div class="eyebrow">Explainable Brain Tumor Detection &amp; Radiomics PACS Platform</div>
+        <h1>Precision AI for <span>Neuroradiology Diagnostics</span></h1>
+        <p class="lede">AI-assisted brain tumor classification, pixel-accurate Attention U-Net segmentation, multi-method Explainable AI heatmaps, and quantitative radiomics feature extraction — built around a trained CNN-ViT hybrid architecture with 50-pass Monte Carlo Dropout.</p>
+        <div class="cta">
+          <a class="btn btn-p btn-lg" href="#">Launch Clinical Analysis →</a>
+          <a class="btn btn-s btn-lg" href="#xai">Explore XAI Visualizations</a>
+        </div>
+      </div>
+      <div class="hero-img"><image-slot id="b-hero" placeholder="Workstation screenshot — scan analysis view"></image-slot></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v">99.8%</div><div class="l">Validation AUC-ROC</div><div class="d">Test set benchmark</div></div>
+      <div class="stat"><div class="v">4 Classes</div><div class="l">Pathology Differential</div><div class="d">Glioma, Menin, Pituitary, Normal</div></div>
+      <div class="stat"><div class="v">50 Passes</div><div class="l">MC-Dropout Uncertainty</div><div class="d">Stochastic variance estimation</div></div>
+      <div class="stat"><div class="v">3 XAI Maps</div><div class="l">Explainable Attribution</div><div class="d">Grad-CAM, ++, Int. Gradients</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="s alt" data-screen-label="Pipeline">
+  <div class="wrap">
+    <div class="sh">
+      <div class="tag">End-to-End Clinical Flow</div>
+      <h2>Autonomous Deep Learning Diagnostic Pipeline</h2>
+      <p>From raw DICOM / MRI slice to multi-dimensional clinical insights in sub-second inference.</p>
+    </div>
+    <div class="flow">
+      <div class="flow-row flow-h"><div>Stage</div><div>Process</div><div>Description</div></div>
+      <div class="flow-row"><div class="no">01</div><div class="ti">MRI Ingestion</div><div class="de">Upload axial brain slice (DICOM/JPG/PNG). Image tensor normalized.</div></div>
+      <div class="flow-row"><div class="no">02</div><div class="ti">Hybrid CNN-ViT</div><div class="de">Dual-branch feature fusion extracting local texture &amp; global context.</div></div>
+      <div class="flow-row"><div class="no">03</div><div class="ti">Uncertainty</div><div class="de">50-pass Monte Carlo Dropout calculates confidence variance &amp; risk tier.</div></div>
+      <div class="flow-row"><div class="no">04</div><div class="ti">Explainable AI</div><div class="de">Generates Grad-CAM, Grad-CAM++, and Integrated Gradients heatmaps.</div></div>
+      <div class="flow-row"><div class="no">05</div><div class="ti">Segmentation</div><div class="de">Attention U-Net delineates precise tumor boundary and area percentage.</div></div>
+      <div class="flow-row"><div class="no">06</div><div class="ti">Radiomics &amp; Report</div><div class="de">Extracts texture, shape, intensity metrics and compiles structured report.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="xai" data-screen-label="XAI Showcase">
+  <div class="wrap">
+    <div class="xai-top">
+      <div class="sh">
+        <div class="tag">Transparent Medical AI</div>
+        <h2>Multi-Method Explainability &amp; Attention Segmentation</h2>
+        <p>NeuroScan AI never acts as an unverified black box. Clinicians inspect voxel-level attribution maps alongside Attention U-Net tumor contours.</p>
+      </div>
+      <div class="seg" role="tablist">
+        <button data-k="gradcam" aria-selected="true">Grad-CAM</button>
+        <button data-k="gradcam_plus">Grad-CAM++</button>
+        <button data-k="ig">Integrated Gradients</button>
+        <button data-k="unet">Attention U-Net</button>
+      </div>
+    </div>
+    <div class="xai">
+      <div class="viewer">
+        <div class="vh"><h3 id="xai-title">ResNet-50 Layer4 Grad-CAM Visual Attribution</h3><span class="ok">Model Checkpoint Verified</span></div>
+        <div class="vb">
+          <div>
+            <div class="pl"><span>Raw Input Brain MRI</span><b>AXIAL T2-FLAIR</b></div>
+            <div class="scan"><image-slot id="b-input" placeholder="Drop axial MRI slice"></image-slot><span class="cap">T1/T2 Axial 224x224</span></div>
+          </div>
+          <div>
+            <div class="pl"><span id="ov-label">Explainability Heatmap Overlay</span><b>CONFIDENCE: 98.4%</b></div>
+            <div class="scan">
+              <image-slot class="ov on" data-k="gradcam" id="b-gradcam" placeholder="Drop Grad-CAM overlay"></image-slot>
+              <image-slot class="ov" data-k="gradcam_plus" id="b-gradcampp" placeholder="Drop Grad-CAM++ overlay"></image-slot>
+              <image-slot class="ov" data-k="ig" id="b-ig" placeholder="Drop Integrated Gradients overlay"></image-slot>
+              <image-slot class="ov" data-k="unet" id="b-unet" placeholder="Drop U-Net mask overlay"></image-slot>
+              <span class="cap" id="ov-cap">GRADCAM Attributed ROI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cards">
+        <div class="card"><h4>Pointing Game Faithfulness</h4><p>Evaluates whether peak CAM attribution activation falls inside the segmented tumor geometry.</p><div class="kv"><span>Attribution Hit Rate:</span><b>1.00 (100% Inside ROI)</b></div></div>
+        <div class="card"><h4>Pixel Flipping Curve</h4><p>Measures model output degradation as top-attributed pixels are systematically masked.</p><div class="kv"><span>Energy (Top 10% Voxels):</span><b>74.2% Total Weight</b></div></div>
+        <div class="card"><h4>Quantitative Radiomics</h4><p>Extracts intensity mean, GLCM contrast, entropy, lesion sphericity, and perimeter.</p><div class="kv"><span>Feature Ranking:</span><b>SHAP Normalized</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s alt" data-screen-label="Roles">
+  <div class="wrap">
+    <div class="sh">
+      <div class="tag">Role-Enforced Workspaces</div>
+      <h2>Dedicated Medical &amp; Administrative Portals</h2>
+      <p>Role-based access controls and customized views tailored for radiologists, technicians, and clinical administrators.</p>
+    </div>
+    <div class="roles">
+      <div class="role doc">
+        <div class="role-h"><div class="r">01 / DOCTOR</div><h3>Doctor Workspace</h3><p>For Neuroradiologists &amp; Neurosurgeons</p></div>
+        <ul>
+          <li>Full MRI viewer with interactive U-Net segmentation overlays and opacity slider</li>
+          <li>Multi-method Explainable AI heatmaps &amp; faithfulness metrics</li>
+          <li>Clinical case management, follow-up timelines, and patient history</li>
+          <li>Instant local diagnostic report generation &amp; print export</li>
+        </ul>
+      </div>
+      <div class="role tech">
+        <div class="role-h"><div class="r">02 / TECHNICIAN</div><h3>Technician Portal</h3><p>For MRI Radiographers &amp; Scanning Technologists</p></div>
+        <ul>
+          <li>Streamlined scan ingestion with patient metadata registry</li>
+          <li>Real-time 8-stage neural pipeline processing status tracking</li>
+          <li>Recent upload logs and verification of image suitability</li>
+          <li>Strict sandboxing preventing unauthorized administrative actions</li>
+        </ul>
+      </div>
+      <div class="role adm">
+        <div class="role-h"><div class="r">03 / ADMINISTRATOR</div><h3>Hospital Administrator</h3><p>For Clinical Directors &amp; IT Operations</p></div>
+        <ul>
+          <li>Complete staff management (Doctor, Tech, Admin account creation)</li>
+          <li>Searchable and filterable SQLite audit trail across all events</li>
+          <li>Institutional scan throughput, detection statistics, and system logs</li>
+          <li>Model performance, ROC-AUC calibration, and ablation study reports</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer data-screen-label="Footer">
+  <div class="wrap">
+    <div class="notice">
+      <div class="ic">!</div>
+      <div>
+        <h4>Mandatory Clinical &amp; Regulatory Notice</h4>
+        <p>NeuroScan AI is an AI-assisted research and decision-support demonstration platform. It is not certified as a primary diagnostic device. All findings, classifications, segmentations, and reports must be verified by a board-certified medical specialist before any clinical action is taken.</p>
+      </div>
+    </div>
+    <div class="foot">
+      <div><b>NeuroScan AI</b> — Deep Learning Brain Tumor Intelligence Platform</div>
+      <div class="mono">CNN-ViT Hybrid • Attention U-Net • PyTorch 2.12</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const XAI = {
+    gradcam:["ResNet-50 Layer4 Grad-CAM Visual Attribution","Explainability Heatmap Overlay"],
+    gradcam_plus:["Grad-CAM++ Weighted Higher-Order Attribution","Explainability Heatmap Overlay"],
+    ig:["Axiomatic Integrated Gradients Attribution (50 Steps)","Explainability Heatmap Overlay"],
+    unet:["Attention U-Net Skip-Gated Lesion Segmentation Mask","Segmentation Mask Overlay"]
+  };
+  document.querySelectorAll('.seg button').forEach(t=>t.addEventListener('click',()=>{
+    const k=t.dataset.k;
+    document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-selected',x===t));
+    document.querySelectorAll('.ov').forEach(o=>o.classList.toggle('on',o.dataset.k===k));
+    document.getElementById('xai-title').textContent=XAI[k][0];
+    document.getElementById('ov-label').textContent=XAI[k][1];
+    document.getElementById('ov-cap').textContent=k.toUpperCase()+' Attributed ROI';
+  }));
+</script>
+</body>
+</html>

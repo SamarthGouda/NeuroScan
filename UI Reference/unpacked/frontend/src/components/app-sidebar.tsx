@@ -29,7 +29,6 @@ import {
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
-import { Logo } from "@/components/logo";
 
 interface MenuItem {
   title: string;
@@ -80,25 +79,34 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border/70 bg-card/60 backdrop-blur-2xl transition-all duration-300">
       {/* Institutional Medical Header */}
       <SidebarHeader className="border-b border-border/70 p-4">
-        <div className="flex items-center justify-between">
-          <Logo size="sm" href="/" showBadge badgeText={roleInfo.badge} />
-        </div>
-        <div className="mt-2 flex items-center justify-between">
-          <p className="text-[11px] text-muted-foreground truncate">{user?.fullName || roleInfo.label}</p>
-          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${roleInfo.color}`}>
-            {roleInfo.badge}
-          </Badge>
+        <div className="flex items-center gap-3">
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-teal-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 ring-1 ring-white/20">
+            <Brain className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+            </span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-black tracking-tight text-foreground font-sans">NEUROSCAN AI</span>
+              <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${roleInfo.color}`}>
+                {roleInfo.badge}
+              </Badge>
+            </div>
+            <p className="text-[11px] text-muted-foreground truncate">{user?.fullName || roleInfo.label}</p>
+          </div>
         </div>
 
         {/* AI Engine Telemetry Pill */}
         <div className="mt-3 rounded-lg bg-background/60 border border-border/60 p-2 text-[11px] flex items-center justify-between font-mono">
           <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Cpu className="h-3.5 w-3.5 text-cyan-500" />
-            <span>CNN-ViT Hybrid</span>
+            <Cpu className="h-3.5 w-3.5 text-cyan-400" />
+            <span>ResNet50+Swin</span>
           </div>
-          <span className="text-emerald-500 font-semibold flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            ONLINE
+          <span className="text-emerald-400 font-semibold flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+            v3.0 READY
           </span>
         </div>
       </SidebarHeader>
@@ -141,14 +149,6 @@ export function AppSidebar() {
 
       {/* Footer with PACS Status & Sign Out */}
       <SidebarFooter className="border-t border-border/70 p-3 bg-card/40">
-        {/* HIPAA / Compliance pill */}
-        <div className="mb-2 px-2 py-1.5 rounded-lg bg-muted/40 border border-border/50 flex items-center justify-between text-[10px] font-mono text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            PACS · HIPAA Compliant
-          </span>
-          <span>v3.0.4</span>
-        </div>
         <SidebarMenu className="space-y-1">
           <SidebarMenuItem>
             <SidebarMenuButton

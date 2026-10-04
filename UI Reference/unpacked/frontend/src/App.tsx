@@ -20,7 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Logo } from "@/components/logo";
 
 // Pages
 import Landing from "@/pages/landing";
@@ -158,10 +157,7 @@ function AuthenticatedContent() {
         <AppSidebar />
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-background">
           {/* Top Clinical Radiology HUD Header */}
-          <header className="flex items-center justify-between px-4 sm:px-6 py-2.5 border-b border-border/70 bg-card/60 backdrop-blur-xl shrink-0 z-20 relative">
-            {/* Subtle gradient accent line at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
-
+          <header className="flex items-center justify-between px-4 sm:px-6 py-2.5 border-b border-border/70 bg-card/60 backdrop-blur-xl shrink-0 z-20">
             <div className="flex items-center gap-3">
               <SidebarTrigger data-testid="button-sidebar-toggle" className="hover:bg-cyan-500/10 hover:text-cyan-400 transition-colors" />
               <div className="h-4 w-px bg-border/80 hidden sm:block" />
@@ -178,7 +174,7 @@ function AuthenticatedContent() {
               </div>
 
               <div className="hidden md:flex items-center gap-2 pl-2">
-                <Badge variant="outline" className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border-emerald-500/20 px-2 py-0.5 shimmer">
+                <Badge variant="outline" className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border-emerald-500/20 px-2 py-0.5">
                   AI Pipeline Online (CNN-ViT + Attention U-Net)
                 </Badge>
               </div>
@@ -195,16 +191,8 @@ function AuthenticatedContent() {
           </header>
 
           {/* Main Workspace Content Area */}
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-b from-background via-background to-card/20 relative">
-            {/* Ambient glow orbs — purely decorative */}
-            <div className="pointer-events-none fixed inset-0 overflow-hidden z-0" aria-hidden="true">
-              <div className="absolute -top-32 -left-32 w-96 h-96 bg-cyan-500/[0.04] rounded-full blur-3xl animate-float" />
-              <div className="absolute top-1/3 -right-24 w-80 h-80 bg-purple-500/[0.04] rounded-full blur-3xl animate-float-delayed" />
-              <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-blue-500/[0.03] rounded-full blur-3xl animate-float" />
-            </div>
-            <div className="relative z-10">
-              <MainRouter role={userRole} />
-            </div>
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-b from-background via-background to-card/20">
+            <MainRouter role={userRole} />
           </main>
         </div>
       </div>
@@ -217,16 +205,10 @@ function AppContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f3f6f4] dark:bg-[#070b12] text-foreground transition-colors duration-300">
-        <div className="flex flex-col items-center gap-6 p-8 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-2xl max-w-sm w-full mx-4 text-center">
-          <Logo size="lg" />
-          <div className="flex items-center gap-3">
-            <div className="h-5 w-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 font-mono">
-              Initializing Clinical Workstation...
-            </p>
-          </div>
-          <span className="text-[10px] font-mono text-slate-400">PACS DICOM • CNN-ViT Engine v3.0.4</span>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-100">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-semibold text-slate-400 font-mono">Initializing NEUROSCAN AI...</p>
         </div>
       </div>
     );
