@@ -732,7 +732,7 @@ export default function LandingPage() {
               Why trust us? Honestly, great question.
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              We wouldn’t trust a random website with our brains either. Here’s why NeuroScan is built completely different from the hundred other "AI tools" that just make stuff up and hope you don't notice.
+              We wouldn’t trust a black-box AI with our brains either. Here is why NeuroScan is engineered differently from generic detection models that make confident guesses without showing their work.
             </p>
           </div>
 
@@ -742,17 +742,17 @@ export default function LandingPage() {
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-cyan-500/30 dark:border-cyan-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-cyan-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono font-bold tracking-widest text-cyan-600 dark:text-cyan-400 uppercase bg-cyan-500/10 px-2.5 py-1 rounded-full">
-                  REAL TALK #01
+                  CONSISTENT FOCUS
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                   Our AI doesn’t get tired at 3:00 AM.
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  Doctors are human. After a 36-hour hospital shift, three lukewarm coffees, and reviewing 150 scans, anyone’s eyes get blurry. Our algorithm doesn’t have an ego, doesn’t check its phone, and inspects scan #400 with the exact same ruthless, unblinking focus as scan #1.
+                  Even the best specialists are human. After back-to-back 24-hour shifts, cold hospital coffee, and reviewing hundreds of grayscale scans, fatigue is real. Our algorithm never blinks, doesn’t suffer from afternoon brain-fog, and inspects scan #500 with the exact same ruthless precision as scan #1.
                 </p>
               </div>
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
-                → Zero fatigue. Zero bad moods. Always dialed in.
+                → Zero fatigue. Zero off-days. Always 100% dialed in.
               </div>
             </div>
 
@@ -760,17 +760,17 @@ export default function LandingPage() {
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-emerald-500/30 dark:border-emerald-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-emerald-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-600 dark:text-emerald-400 uppercase bg-emerald-500/10 px-2.5 py-1 rounded-full">
-                  REAL TALK #02
+                  NO BLACK BOXES
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  We show our homework. Unlike your ex.
+                  We show our proof. Every single millimeter.
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  Most medical AI tools give you a vague "yep, looks abnormal" and expect you to blindly believe them. We highlight every suspicious millimeter, draw exact borders, and explain the clues step-by-step. If we can't prove why we flagged something, you shouldn't take our word for it anyway.
+                  Most diagnostic software gives you a vague "anomaly detected" and expects you to just accept it. We don't do blind faith. NeuroScan highlights the exact tissue regions, outlines the margins, and explains the visual evidence layer by layer. If an algorithm can't prove why it flagged something, nobody should trust it.
                 </p>
               </div>
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                → No secret black box. What we see is what you see.
+                → Complete visual transparency. You inspect every decision.
               </div>
             </div>
 
@@ -778,17 +778,17 @@ export default function LandingPage() {
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-purple-500/30 dark:border-purple-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-purple-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono font-bold tracking-widest text-purple-600 dark:text-purple-400 uppercase bg-purple-500/10 px-2.5 py-1 rounded-full">
-                  REAL TALK #03
+                  HONEST NUMBERS
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                   98.4% accuracy. Math won't let us be modest.
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  Could we claim 100% like those sketchy miracle health apps on social media? Sure, if we wanted real radiologists to laugh us out of the building. 98.4% is verified, peer-tested science. And for that tricky 1.6%? We actually tell you "hey, we’re not sure, get a second opinion" instead of pretending to be God.
+                  Could we claim 100% like those sketchy health blogs? Sure, if we wanted real radiologists to laugh us out of the building. 98.4% is verified, peer-tested science. And for that remaining 1.6%? We actually display an 'Uncertainty Meter' instead of pretending an AI can never make a mistake.
                 </p>
               </div>
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-purple-600 dark:text-purple-400 font-semibold">
-                → We admit uncertainty instead of guessing.
+                → We quantify uncertainty instead of guessing.
               </div>
             </div>
 
@@ -796,17 +796,17 @@ export default function LandingPage() {
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-amber-500/30 dark:border-amber-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-amber-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono font-bold tracking-widest text-amber-600 dark:text-amber-400 uppercase bg-amber-500/10 px-2.5 py-1 rounded-full">
-                  REAL TALK #04
+                  ZERO ANXIETY WAITING
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                   Three seconds vs. three agonizing weeks.
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  Ever had to wait three weeks for routine scan results while anxiously refreshing your email every 4 minutes? Yeah, it's torture. We run four independent detection checks, cross-verify the tumor margins, and draft your complete diagnostic summary before you even finish taking a sip of water.
+                  Anyone who has waited weeks for routine brain imaging results knows the anxiety of constantly checking the patient portal. NeuroScan runs four independent diagnostic passes, cross-verifies tumor boundaries, and generates a structured clinical brief before you even finish your coffee.
                 </p>
               </div>
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-amber-600 dark:text-amber-400 font-semibold">
-                → Full breakdown in under 3.2 seconds.
+                → Comprehensive analysis synthesized in under 3.2 seconds.
               </div>
             </div>
 
@@ -814,17 +814,17 @@ export default function LandingPage() {
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-rose-500/30 dark:border-rose-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-rose-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono font-bold tracking-widest text-rose-600 dark:text-rose-400 uppercase bg-rose-500/10 px-2.5 py-1 rounded-full">
-                  REAL TALK #05
+                  HUMAN + MACHINE
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-                  Not here to fire doctors. Just saving sanity.
+                  Built to empower specialists, not replace them.
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  We’re not replacing the neurosurgeon who spent 15 years in medical school. Think of us as their obsessive, hyper-alert assistant who spots a tiny 2-millimeter abnormality on page 40 and whispers, "Hey doc, take a look right here." We give specialists superhuman vision so nothing slips through.
+                  We’re not replacing the neurosurgeon who spent 15 years in medical school. Think of us as their relentless digital co-pilot who catches that subtle 2-millimeter abnormality on slice 47 and brings it straight to their attention. The future of healthcare isn't AI replacing doctors—it's doctors using AI to save more lives.
                 </p>
               </div>
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-rose-600 dark:text-rose-400 font-semibold">
-                → AI won't replace doctors. It gives them superpowers.
+                → Clinical-grade decision support with human oversight.
               </div>
             </div>
 
@@ -832,17 +832,17 @@ export default function LandingPage() {
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-blue-500/30 dark:border-blue-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-blue-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">
                 <span className="text-[10px] font-mono font-bold tracking-widest text-blue-600 dark:text-blue-400 uppercase bg-blue-500/10 px-2.5 py-1 rounded-full">
-                  REAL TALK #06
+                  TRANSPARENT ACCESS
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  Zero sales pitch. No "unlock your scan" paywalls.
+                  No sales calls. No paywalled answers.
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
-                  You don’t have to "Book a 45-minute sales demo" or hand over your credit card for a sneaky 7-day trial. Upload your scan, get instant clinical clarity, download your verified report, and show it to your physician. Because answers about your brain shouldn't feel like buying a used car.
+                  You don’t have to "Schedule a 30-minute sales consultation" or hand over institutional credit cards just to see the technology work. Upload an MRI scan, inspect the full explainability heatmaps, generate a report, and verify the findings. Because clinical innovation should be immediately accessible, not trapped behind enterprise red tape.
                 </p>
               </div>
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-blue-600 dark:text-blue-400 font-semibold">
-                → Instant access. Zero corporate runaround.
+                → Immediate workstation access. No sales pitches.
               </div>
             </div>
 
@@ -851,7 +851,7 @@ export default function LandingPage() {
           {/* Sarcastic Advertising Quote Banner */}
           <div className="mt-12 max-w-4xl mx-auto p-8 rounded-3xl bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 text-center space-y-4 shadow-sm">
             <p className="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200 italic leading-relaxed">
-              “Rule of thumb: If an AI tool promises 100% perfection, run away. If it shows you its exact reasoning, admits its limits, and points out the evidence — that’s NeuroScan.”
+              “Rule of thumb: If a healthcare AI promises 100% perfection, walk away. If it shows you its exact reasoning, quantifies its uncertainty, and highlights the physical evidence — that’s NeuroScan.”
             </p>
             <div className="pt-2 flex flex-wrap justify-center gap-4 items-center">
               <Link href="/login">
