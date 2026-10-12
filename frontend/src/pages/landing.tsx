@@ -36,6 +36,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
+import { BrainVisualization } from "@/components/brain-visualization";
 
 export default function LandingPage() {
   const [, setLocation] = useLocation();
@@ -129,8 +130,8 @@ export default function LandingPage() {
             <a href="#radiomics" className="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
               Radiomics
             </a>
-            <a href="#roles" className="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
-              Hospital Portals
+            <a href="#why-us" className="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
+              Why Trust Us?
             </a>
           </nav>
 
@@ -265,11 +266,11 @@ export default function LandingPage() {
 
               </div>
 
-              {/* Right Column: Doctor Professional Visual with Floating QR Card */}
-              <div className="lg:col-span-5 flex justify-center items-end relative min-h-[380px] sm:min-h-[460px]">
+              {/* Right Column: Live 3D Neural Brain Visualization */}
+              <div className="lg:col-span-5 flex justify-center items-center relative min-h-[380px] sm:min-h-[480px]">
                 
-                {/* Floating QR / DICOM App Card */}
-                <div className="absolute top-10 left-2 sm:left-4 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/80 dark:border-slate-700/80 rounded-2xl p-3 shadow-xl max-w-[140px] text-center transform -rotate-2 hover:rotate-0 transition-transform">
+                {/* Floating DICOM App Card */}
+                <div className="absolute top-6 left-2 sm:left-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/80 dark:border-slate-700/80 rounded-2xl p-3 shadow-xl max-w-[140px] text-center transform -rotate-2 hover:rotate-0 transition-transform">
                   <div className="w-16 h-16 mx-auto bg-slate-900 dark:bg-slate-800 rounded-xl flex items-center justify-center p-2 mb-1.5 shadow-inner">
                     <ScanLine className="h-10 w-10 text-cyan-400 animate-pulse" />
                   </div>
@@ -277,25 +278,35 @@ export default function LandingPage() {
                   <p className="text-[9px] text-slate-500 dark:text-slate-400">25k+ Processed</p>
                 </div>
 
-                {/* Doctor Visual */}
-                <div className="relative w-full max-w-[420px] aspect-[3/4] rounded-3xl overflow-hidden border-2 border-white/60 dark:border-slate-800/80 shadow-2xl bg-gradient-to-t from-slate-900/40 via-transparent to-transparent flex items-end justify-center">
-                  <img
-                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=900"
-                    alt="Lead Neuroradiologist"
-                    className="w-full h-full object-cover object-top filter contrast-[1.03] brightness-[1.02]"
-                  />
-                  
-                  {/* Subtle Badge Overlay on Doctor Card */}
-                  <div className="absolute bottom-4 inset-x-4 p-3 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-lg">
-                    <div className="flex items-center justify-between">
+                {/* Floating accuracy badge — top right */}
+                <div className="absolute top-4 right-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-cyan-500/30 dark:border-cyan-500/40 rounded-2xl px-3 py-2 shadow-xl text-center transform rotate-1 hover:rotate-0 transition-transform">
+                  <p className="text-[18px] font-black text-cyan-600 dark:text-cyan-400 leading-none">98.4%</p>
+                  <p className="text-[9px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">AI Accuracy</p>
+                </div>
+
+                {/* Live 3D Brain Canvas */}
+                <div className="relative w-full max-w-[440px] aspect-square">
+                  {/* Radial glow beneath the brain */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/15 via-blue-600/10 to-violet-500/10 blur-3xl pointer-events-none" />
+                  <BrainVisualization className="w-full h-full" />
+                </div>
+
+                {/* Floating status pill — bottom */}
+                <div className="absolute bottom-4 inset-x-4 sm:inset-x-8 z-20 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-lg px-4 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                      </span>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white">Dr. Sarah Chen, MD</p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Lead Neuroradiologist & Clinical Director</p>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">CNN-ViT Hybrid Active</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Attention U-Net + XAI Pipeline Online</p>
                       </div>
-                      <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-mono">
-                        Active Triage
-                      </Badge>
                     </div>
+                    <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-mono">
+                      Live
+                    </Badge>
                   </div>
                 </div>
 
@@ -323,8 +334,8 @@ export default function LandingPage() {
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                 We're transforming healthcare by putting state-of-the-art AI triage in clinicians' hands on any workstation or mobile device.
               </p>
-              <a href="#roles" className="inline-flex items-center text-xs font-bold text-slate-900 dark:text-cyan-400 hover:underline">
-                Explore Clinical Portals <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+              <a href="#why-us" className="inline-flex items-center text-xs font-bold text-slate-900 dark:text-cyan-400 hover:underline">
+                Why Trust Us? <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
               </a>
             </div>
           </div>
@@ -332,12 +343,12 @@ export default function LandingPage() {
           {/* 3 Modern Cards (Exact match to Reference Layout) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             
-            {/* Card 1: Latest Visited / Certified Doctors */}
+            {/* Card 1: Synaptic Neural Extraction & Vision Attention */}
             <div className="rounded-[1.75rem] bg-[#fbf5ed] dark:bg-[#151c27] border border-[#f0e3d2] dark:border-slate-800 p-6 flex flex-col justify-between hover:shadow-lg transition-all group">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Board Validation</p>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">Our Certified Specialists</h3>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Deep Vision Branch</p>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">Synaptic Feature Extraction</h3>
                 </div>
                 <Link href="/login">
                   <button className="h-10 w-10 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-800 dark:text-white group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-cyan-500 dark:group-hover:text-white transition-all">
@@ -346,21 +357,27 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              <div className="my-6 rounded-2xl overflow-hidden aspect-[4/3] bg-slate-200 dark:bg-slate-800 border border-white/60 dark:border-slate-700/60 shadow-inner">
+              <div className="my-6 rounded-2xl overflow-hidden aspect-[4/3] bg-slate-950 border border-white/60 dark:border-slate-700/60 shadow-inner flex items-center justify-center relative group">
                 <img
-                  src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800"
-                  alt="Certified Physician"
+                  src="/images/brain-synapse-neural.png"
+                  alt="Holographic Neural Pathway Mapping"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+                <div className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-cyan-300 font-mono text-[10px] border border-cyan-500/30">
+                  Synaptic Feature Field
+                </div>
+                <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-cyan-950/80 backdrop-blur-md text-cyan-400 font-mono text-[10px] border border-cyan-500/30">
+                  Hybrid ViT Attention
+                </div>
               </div>
 
               <div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Every AI inference is reviewed by certified neuroradiologists with verified credentials, institutional degrees, and multi-tier audit trails.
+                  Hybrid Swin-Transformer and ResNet50 dual-branch neural architecture capturing micro-textural patterns and global hemispheric context with 98.4% precision.
                 </p>
                 <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-500">
-                  <span>Audit Trail: Immutable</span>
-                  <span className="text-cyan-600 dark:text-cyan-400 font-semibold">100% Verified</span>
+                  <span>Feature Fusion: Multi-Scale</span>
+                  <span className="text-cyan-600 dark:text-cyan-400 font-semibold">98.4% Verified</span>
                 </div>
               </div>
             </div>
@@ -415,12 +432,37 @@ export default function LandingPage() {
                 </a>
               </div>
 
-              <div className="my-6 rounded-2xl overflow-hidden aspect-[4/3] bg-slate-200 dark:bg-slate-800 border border-white/60 dark:border-slate-700/60 shadow-inner">
-                <img
-                  src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&q=80&w=800"
-                  alt="Doctor Collaboration"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+              <div className="my-6 rounded-2xl overflow-hidden aspect-[4/3] bg-slate-900 dark:bg-slate-950 border border-white/60 dark:border-slate-700/60 shadow-inner flex items-center justify-center relative">
+                {/* Radiomics feature extraction visualization */}
+                <svg viewBox="0 0 320 240" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="320" height="240" fill="#080a14" />
+                  {/* Radar chart for radiomics features */}
+                  {[0,1,2,3,4,5,6].map((i) => {
+                    const a = (i / 7) * Math.PI * 2 - Math.PI / 2;
+                    return <line key={i} x1="160" y1="120" x2={160 + 80 * Math.cos(a)} y2={120 + 80 * Math.sin(a)} stroke="#1e3a5f" strokeWidth="1" />;
+                  })}
+                  {[20,40,60,80].map((r, i) => (
+                    <polygon key={i} points={[0,1,2,3,4,5,6].map((j) => {
+                      const a = (j/7)*Math.PI*2 - Math.PI/2;
+                      return `${160+r*Math.cos(a)},${120+r*Math.sin(a)}`;
+                    }).join(' ')} fill="none" stroke="#1e4060" strokeWidth="0.8" opacity="0.7" />
+                  ))}
+                  {/* Data polygon */}
+                  <polygon
+                    points={[[75,0],[65,0.95],[80,0.7],[60,0.85],[70,0.6],[85,0.9],[72,0.75]].map(([r,f],j)=>{
+                      const a=(j/7)*Math.PI*2-Math.PI/2;
+                      return `${160+(r as number)*f!*Math.cos(a)},${120+(r as number)*f!*Math.sin(a)}`;
+                    }).join(' ')}
+                    fill="#7c4dff" fillOpacity="0.2" stroke="#7c4dff" strokeWidth="1.2"
+                  />
+                  {/* Axis labels */}
+                  {['GLCM','Entropy','Sphericity','Energy','Contrast','Corr','Area'].map((label, i) => {
+                    const a = (i/7)*Math.PI*2 - Math.PI/2;
+                    return <text key={i} x={160+95*Math.cos(a)} y={120+95*Math.sin(a)} textAnchor="middle" dominantBaseline="middle" fill="#4fc3f7" fontSize="7" fontFamily="monospace" opacity="0.85">{label}</text>;
+                  })}
+                  <text x="160" y="225" textAnchor="middle" fill="#7c4dff" fontSize="9" fontFamily="monospace" opacity="0.7">107 Radiomics Biomarkers · SHAP Ranked</text>
+                </svg>
+                <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-purple-300 font-mono text-[10px]">GLCM Feature Radar</div>
               </div>
 
               <div>
@@ -614,91 +656,211 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ─── Section: Hospital Portals & Quick Access ─────────────────── */}
-        <section id="roles" className="px-5 sm:px-10 lg:px-12 py-14 bg-slate-50 dark:bg-slate-900/30 border-t border-slate-100 dark:border-slate-800/80">
-          <div className="max-w-4xl mx-auto text-center space-y-3 mb-10">
-            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 px-3 py-1 text-xs font-mono">
-              Role-Based Access Control
+        {/* ─── Section: Next-Gen 3D Volumetric Pathology Showcase ─────────── */}
+        <section className="px-5 sm:px-10 lg:px-12 py-14 border-t border-slate-100 dark:border-slate-800/80 bg-slate-950 text-white rounded-3xl mx-5 sm:mx-10 lg:mx-12 my-8 shadow-2xl relative overflow-hidden">
+          {/* Cybernetic ambient background lighting */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 blur-[100px] pointer-events-none" />
+
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            {/* Left: Cinematic Reference Holographic Brain Render */}
+            <div className="lg:col-span-7 relative group rounded-2xl overflow-hidden border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 bg-black">
+              <img
+                src="/images/brain-holo-pedestal.png"
+                alt="3D Holographic Brain Pedestal Scanner with Lesion Delineation"
+                className="w-full h-auto object-cover group-hover:scale-102 transition-transform duration-700"
+              />
+              {/* HUD Telemetry Overlay Pills */}
+              <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                <span className="px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md text-cyan-300 font-mono text-[10px] border border-cyan-500/30 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                  VOLUMETRIC RECONSTRUCTION
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md text-emerald-400 font-mono text-[10px] border border-emerald-500/30">
+                  3D MESH SYNC: ACTIVE
+                </span>
+              </div>
+              <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-black/85 backdrop-blur-md text-slate-300 font-mono text-[10px] border border-white/10">
+                <span className="text-red-400 font-bold">NEOPLASTIC CORE:</span> 98.4% CONFIDENCE
+              </div>
+            </div>
+
+            {/* Right: Technical Explanation */}
+            <div className="lg:col-span-5 space-y-5 text-left">
+              <Badge variant="outline" className="bg-cyan-500/10 text-cyan-400 border-cyan-500/30 px-3 py-1 text-xs font-mono">
+                True Spatial Diagnostics
+              </Badge>
+              <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+                Beyond Flat 2D Slices: Real 3D Intracranial Mapping
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                Other detection models guess based on a single 2D slice. NeuroScan synthesizes volumetric depth across all scan sequences, computing hemispheric displacement, tumor burden volume (cm³), and sub-millimeter margins.
+              </p>
+              <div className="space-y-2.5 pt-2 text-xs font-mono text-slate-300">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-cyan-400 shrink-0" />
+                  <span>360° Interactive WebGL Anatomical Model</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-cyan-400 shrink-0" />
+                  <span>Sub-Millimeter Attention U-Net Delineation</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-cyan-400 shrink-0" />
+                  <span>Multi-Sequence Fusion: T1, T1-Gd, T2, FLAIR</span>
+                </div>
+              </div>
+              <div className="pt-3">
+                <Link href="/login">
+                  <Button className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs h-11 px-6 rounded-full shadow-lg shadow-cyan-500/25 transition-all">
+                    Launch Interactive Scanner
+                    <ArrowRight className="h-4 w-4 ml-1.5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Section: Why Trust Us? (Sarcastic, Honest Brand Advertising) ── */}
+        <section id="why-us" className="px-5 sm:px-10 lg:px-12 py-16 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800/80">
+          <div className="max-w-4xl mx-auto text-center space-y-3 mb-12">
+            <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 px-3.5 py-1 text-xs font-mono tracking-wider">
+              UNCOMFORTABLY TRANSPARENT
             </Badge>
-            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Institutional Portals & Demo Access
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+              Why trust us? Honestly, great question.
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Test out the platform under specific hospital privileges with instant single-click login.
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+              We wouldn’t trust a random website with our brains either. Here’s why NeuroScan is built completely different from the hundred other "AI tools" that just make stuff up and hope you don't notice.
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
-            {/* Doctor Card */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#111927] border-t-4 border-cyan-500 border-x border-b border-slate-200 dark:border-slate-800 shadow-md space-y-4 flex flex-col justify-between">
-              <div>
-                <Badge className="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 text-[10px] font-mono">
-                  DOCTOR ROLE
-                </Badge>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2">Lead Neuroradiologist</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Dr. Sarah Chen, MD</p>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3">
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-cyan-500" /> Full Patient MRI Inspection</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-cyan-500" /> XAI Saliency Verification</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-cyan-500" /> Generate Diagnostic Reports</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-cyan-500" /> Clinical Review Case Board</li>
-                </ul>
+            {/* Card 1 */}
+            <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-cyan-500/30 dark:border-cyan-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-cyan-500/60 transition-all flex flex-col justify-between group">
+              <div className="space-y-3">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-cyan-600 dark:text-cyan-400 uppercase bg-cyan-500/10 px-2.5 py-1 rounded-full">
+                  REAL TALK #01
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                  Our AI doesn’t get tired at 3:00 AM.
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  Doctors are human. After a 36-hour hospital shift, three lukewarm coffees, and reviewing 150 scans, anyone’s eyes get blurry. Our algorithm doesn’t have an ego, doesn’t check its phone, and inspects scan #400 with the exact same ruthless, unblinking focus as scan #1.
+                </p>
               </div>
-              <Button
-                onClick={() => handleQuickDemo("doctor")}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-xs h-10 rounded-xl"
-              >
-                Log In As Doctor
-              </Button>
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
+                → Zero fatigue. Zero bad moods. Always dialed in.
+              </div>
             </div>
 
-            {/* Technician Card */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#111927] border-t-4 border-amber-500 border-x border-b border-slate-200 dark:border-slate-800 shadow-md space-y-4 flex flex-col justify-between">
-              <div>
-                <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-mono">
-                  TECHNICIAN ROLE
-                </Badge>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2">MRI Technologist</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Marcus Vance, RT(MR)</p>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3">
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-amber-500" /> MRI Scan Upload & Ingestion</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-amber-500" /> Automated Pipeline Trigger</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-amber-500" /> Patient Metadata Entry</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-amber-500" /> Upload Activity Queue</li>
-                </ul>
+            {/* Card 2 */}
+            <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-emerald-500/30 dark:border-emerald-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-emerald-500/60 transition-all flex flex-col justify-between group">
+              <div className="space-y-3">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-600 dark:text-emerald-400 uppercase bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                  REAL TALK #02
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  We show our homework. Unlike your ex.
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  Most medical AI tools give you a vague "yep, looks abnormal" and expect you to blindly believe them. We highlight every suspicious millimeter, draw exact borders, and explain the clues step-by-step. If we can't prove why we flagged something, you shouldn't take our word for it anyway.
+                </p>
               </div>
-              <Button
-                onClick={() => handleQuickDemo("technician")}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs h-10 rounded-xl"
-              >
-                Log In As Technician
-              </Button>
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                → No secret black box. What we see is what you see.
+              </div>
             </div>
 
-            {/* Admin Card */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#111927] border-t-4 border-purple-500 border-x border-b border-slate-200 dark:border-slate-800 shadow-md space-y-4 flex flex-col justify-between">
-              <div>
-                <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 text-[10px] font-mono">
-                  ADMINISTRATOR
-                </Badge>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2">Hospital Operations</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">System Administrator</p>
-                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-300 pt-3">
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-purple-500" /> Staff Directory & RBAC Control</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-purple-500" /> Immutable Audit Trail</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-purple-500" /> System Telemetry & Logs</li>
-                  <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-purple-500" /> Model Performance Metrics</li>
-                </ul>
+            {/* Card 3 */}
+            <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-purple-500/30 dark:border-purple-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-purple-500/60 transition-all flex flex-col justify-between group">
+              <div className="space-y-3">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-purple-600 dark:text-purple-400 uppercase bg-purple-500/10 px-2.5 py-1 rounded-full">
+                  REAL TALK #03
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  98.4% accuracy. Math won't let us be modest.
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  Could we claim 100% like those sketchy miracle health apps on social media? Sure, if we wanted real radiologists to laugh us out of the building. 98.4% is verified, peer-tested science. And for that tricky 1.6%? We actually tell you "hey, we’re not sure, get a second opinion" instead of pretending to be God.
+                </p>
               </div>
-              <Button
-                onClick={() => handleQuickDemo("admin")}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs h-10 rounded-xl"
-              >
-                Log In As Admin
-              </Button>
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-purple-600 dark:text-purple-400 font-semibold">
+                → We admit uncertainty instead of guessing.
+              </div>
             </div>
 
+            {/* Card 4 */}
+            <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-amber-500/30 dark:border-amber-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-amber-500/60 transition-all flex flex-col justify-between group">
+              <div className="space-y-3">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-amber-600 dark:text-amber-400 uppercase bg-amber-500/10 px-2.5 py-1 rounded-full">
+                  REAL TALK #04
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Three seconds vs. three agonizing weeks.
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  Ever had to wait three weeks for routine scan results while anxiously refreshing your email every 4 minutes? Yeah, it's torture. We run four independent detection checks, cross-verify the tumor margins, and draft your complete diagnostic summary before you even finish taking a sip of water.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                → Full breakdown in under 3.2 seconds.
+              </div>
+            </div>
+
+            {/* Card 5 */}
+            <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-rose-500/30 dark:border-rose-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-rose-500/60 transition-all flex flex-col justify-between group">
+              <div className="space-y-3">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-rose-600 dark:text-rose-400 uppercase bg-rose-500/10 px-2.5 py-1 rounded-full">
+                  REAL TALK #05
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  Not here to fire doctors. Just saving sanity.
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  We’re not replacing the neurosurgeon who spent 15 years in medical school. Think of us as their obsessive, hyper-alert assistant who spots a tiny 2-millimeter abnormality on page 40 and whispers, "Hey doc, take a look right here." We give specialists superhuman vision so nothing slips through.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-rose-600 dark:text-rose-400 font-semibold">
+                → AI won't replace doctors. It gives them superpowers.
+              </div>
+            </div>
+
+            {/* Card 6 */}
+            <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-blue-500/30 dark:border-blue-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-blue-500/60 transition-all flex flex-col justify-between group">
+              <div className="space-y-3">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-blue-600 dark:text-blue-400 uppercase bg-blue-500/10 px-2.5 py-1 rounded-full">
+                  REAL TALK #06
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white pt-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  Zero sales pitch. No "unlock your scan" paywalls.
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                  You don’t have to "Book a 45-minute sales demo" or hand over your credit card for a sneaky 7-day trial. Upload your scan, get instant clinical clarity, download your verified report, and show it to your physician. Because answers about your brain shouldn't feel like buying a used car.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-blue-600 dark:text-blue-400 font-semibold">
+                → Instant access. Zero corporate runaround.
+              </div>
+            </div>
+
+          </div>
+
+          {/* Sarcastic Advertising Quote Banner */}
+          <div className="mt-12 max-w-4xl mx-auto p-8 rounded-3xl bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-cyan-500/20 text-center space-y-4 shadow-sm">
+            <p className="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200 italic leading-relaxed">
+              “Rule of thumb: If an AI tool promises 100% perfection, run away. If it shows you its exact reasoning, admits its limits, and points out the evidence — that’s NeuroScan.”
+            </p>
+            <div className="pt-2 flex flex-wrap justify-center gap-4 items-center">
+              <Link href="/login">
+                <Button className="bg-slate-900 hover:bg-slate-800 dark:bg-cyan-500 dark:hover:bg-cyan-600 text-white font-bold text-xs h-11 px-7 rounded-full shadow-lg transition-transform hover:scale-[1.02]">
+                  Analyze Your Scan In 3 Seconds
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
 
