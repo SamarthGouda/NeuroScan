@@ -40,7 +40,7 @@ import { BrainVisualization } from "@/components/brain-visualization";
 
 export default function LandingPage() {
   const [, setLocation] = useLocation();
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const [activeXaiTab, setActiveXaiTab] = useState<"gradcam" | "gradcam_plus" | "scorecam" | "ig" | "unet">("gradcam");
 
   const xaiMap = {
@@ -86,26 +86,11 @@ export default function LandingPage() {
     },
   };
 
-  const handleQuickDemo = async (role: "doctor" | "technician" | "admin") => {
-    const creds = {
-      doctor: { username: "doctor", password: "doctor123" },
-      technician: { username: "technician", password: "tech123" },
-      admin: { username: "admin", password: "admin123" },
-    }[role];
-
-    try {
-      await login(creds);
-      setLocation("/");
-    } catch {
-      setLocation("/login");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#f3f6f4] dark:bg-[#070b12] text-foreground selection:bg-cyan-500 selection:text-white p-2 sm:p-5 lg:p-7 transition-colors duration-300">
       {/* ─── Outer Container Frame (Inspired by Reference UI) ─────────────── */}
       <div className="max-w-[1440px] mx-auto bg-white dark:bg-[#0c121d] rounded-[2rem] sm:rounded-[2.5rem] border border-slate-200/90 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-300">
-        
+
         {/* ─── Top Navigation Bar ────────────────────────────────────────── */}
         <header className="px-5 sm:px-8 lg:px-10 py-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80">
           {/* Logo */}
@@ -187,16 +172,16 @@ export default function LandingPage() {
         {/* ─── Hero Section (Exact match to Reference Aesthetic) ─────────── */}
         <section id="hero" className="p-4 sm:p-7 lg:p-8">
           <div className="rounded-[2rem] bg-gradient-to-br from-[#cbe5eb] via-[#dceae8] to-[#f5dfcf] dark:from-[#0d2a3c] dark:via-[#112431] dark:to-[#221c25] p-6 sm:p-10 lg:p-14 relative overflow-hidden border border-cyan-200/50 dark:border-cyan-900/40 shadow-sm">
-            
+
             {/* Background subtle radial flares */}
             <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/40 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#ffd8b8]/30 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
-              
+
               {/* Left Column: Mission, Values & Headline */}
               <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-                
+
                 {/* Eyebrow Pill */}
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-700/60 text-slate-800 dark:text-cyan-300 text-xs font-semibold backdrop-blur-md shadow-xs">
                   <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
@@ -240,7 +225,7 @@ export default function LandingPage() {
                 {/* Floating Stats Bar Pill (Exact Reference Spec) */}
                 <div className="pt-4">
                   <div className="inline-flex flex-wrap items-center bg-white/75 dark:bg-slate-900/80 backdrop-blur-md border border-white/80 dark:border-slate-700/80 rounded-2xl sm:rounded-full px-5 py-3 sm:py-3.5 shadow-md shadow-slate-900/5 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-slate-800 gap-4 sm:gap-0">
-                    
+
                     <div className="sm:pr-6 text-left">
                       <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">24/7</p>
                       <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Emergency AI Triage</p>
@@ -268,7 +253,7 @@ export default function LandingPage() {
 
               {/* Right Column: Live 3D Neural Brain Visualization */}
               <div className="lg:col-span-5 flex justify-center items-center relative min-h-[380px] sm:min-h-[480px]">
-                
+
                 {/* Floating DICOM App Card */}
                 <div className="absolute top-6 left-2 sm:left-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/80 dark:border-slate-700/80 rounded-2xl p-3 shadow-xl max-w-[140px] text-center transform -rotate-2 hover:rotate-0 transition-transform">
                   <div className="w-16 h-16 mx-auto bg-slate-900 dark:bg-slate-800 rounded-xl flex items-center justify-center p-2 mb-1.5 shadow-inner">
@@ -318,7 +303,7 @@ export default function LandingPage() {
 
         {/* ─── Section: Anytime & Anywhere Your Health First ────────────── */}
         <section id="triage" className="px-5 sm:px-10 lg:px-12 py-12 border-t border-slate-100 dark:border-slate-800/80">
-          
+
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
@@ -342,7 +327,7 @@ export default function LandingPage() {
 
           {/* 3 Modern Cards (Exact match to Reference Layout) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            
+
             {/* Card 1: Synaptic Neural Extraction & Vision Attention */}
             <div className="rounded-[1.75rem] bg-[#fbf5ed] dark:bg-[#151c27] border border-[#f0e3d2] dark:border-slate-800 p-6 flex flex-col justify-between hover:shadow-lg transition-all group">
               <div className="flex items-start justify-between">
@@ -437,28 +422,28 @@ export default function LandingPage() {
                 <svg viewBox="0 0 320 240" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                   <rect width="320" height="240" fill="#080a14" />
                   {/* Radar chart for radiomics features */}
-                  {[0,1,2,3,4,5,6].map((i) => {
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => {
                     const a = (i / 7) * Math.PI * 2 - Math.PI / 2;
                     return <line key={i} x1="160" y1="120" x2={160 + 80 * Math.cos(a)} y2={120 + 80 * Math.sin(a)} stroke="#1e3a5f" strokeWidth="1" />;
                   })}
-                  {[20,40,60,80].map((r, i) => (
-                    <polygon key={i} points={[0,1,2,3,4,5,6].map((j) => {
-                      const a = (j/7)*Math.PI*2 - Math.PI/2;
-                      return `${160+r*Math.cos(a)},${120+r*Math.sin(a)}`;
+                  {[20, 40, 60, 80].map((r, i) => (
+                    <polygon key={i} points={[0, 1, 2, 3, 4, 5, 6].map((j) => {
+                      const a = (j / 7) * Math.PI * 2 - Math.PI / 2;
+                      return `${160 + r * Math.cos(a)},${120 + r * Math.sin(a)}`;
                     }).join(' ')} fill="none" stroke="#1e4060" strokeWidth="0.8" opacity="0.7" />
                   ))}
                   {/* Data polygon */}
                   <polygon
-                    points={[[75,0],[65,0.95],[80,0.7],[60,0.85],[70,0.6],[85,0.9],[72,0.75]].map(([r,f],j)=>{
-                      const a=(j/7)*Math.PI*2-Math.PI/2;
-                      return `${160+(r as number)*f!*Math.cos(a)},${120+(r as number)*f!*Math.sin(a)}`;
+                    points={[[75, 0], [65, 0.95], [80, 0.7], [60, 0.85], [70, 0.6], [85, 0.9], [72, 0.75]].map(([r, f], j) => {
+                      const a = (j / 7) * Math.PI * 2 - Math.PI / 2;
+                      return `${160 + (r as number) * f! * Math.cos(a)},${120 + (r as number) * f! * Math.sin(a)}`;
                     }).join(' ')}
                     fill="#7c4dff" fillOpacity="0.2" stroke="#7c4dff" strokeWidth="1.2"
                   />
                   {/* Axis labels */}
-                  {['GLCM','Entropy','Sphericity','Energy','Contrast','Corr','Area'].map((label, i) => {
-                    const a = (i/7)*Math.PI*2 - Math.PI/2;
-                    return <text key={i} x={160+95*Math.cos(a)} y={120+95*Math.sin(a)} textAnchor="middle" dominantBaseline="middle" fill="#4fc3f7" fontSize="7" fontFamily="monospace" opacity="0.85">{label}</text>;
+                  {['GLCM', 'Entropy', 'Sphericity', 'Energy', 'Contrast', 'Corr', 'Area'].map((label, i) => {
+                    const a = (i / 7) * Math.PI * 2 - Math.PI / 2;
+                    return <text key={i} x={160 + 95 * Math.cos(a)} y={120 + 95 * Math.sin(a)} textAnchor="middle" dominantBaseline="middle" fill="#4fc3f7" fontSize="7" fontFamily="monospace" opacity="0.85">{label}</text>;
                   })}
                   <text x="160" y="225" textAnchor="middle" fill="#7c4dff" fontSize="9" fontFamily="monospace" opacity="0.7">107 Radiomics Biomarkers · SHAP Ranked</text>
                 </svg>
@@ -498,11 +483,10 @@ export default function LandingPage() {
                 <button
                   key={key}
                   onClick={() => setActiveXaiTab(key)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                    activeXaiTab === key
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${activeXaiTab === key
                       ? "bg-slate-900 dark:bg-cyan-500 text-white shadow-md shadow-slate-900/10 dark:shadow-cyan-500/20"
                       : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
-                  }`}
+                    }`}
                 >
                   {xaiMap[key].tag} — {key.toUpperCase().replace("_", " ")}
                 </button>
@@ -512,7 +496,7 @@ export default function LandingPage() {
 
           {/* Interactive Viewer Grid */}
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-white dark:bg-[#0f172a] rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
-            
+
             {/* Visual Heatmap Box */}
             <div className="md:col-span-6 space-y-3">
               <div className="aspect-square bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 relative flex items-center justify-center group shadow-inner">
@@ -592,7 +576,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
             <div className="p-6 rounded-2xl bg-white dark:bg-[#111927] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hover:border-cyan-500/40 transition-all">
               <div className="h-10 w-10 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-mono font-bold text-sm">
                 01
@@ -737,7 +721,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
             {/* Card 1 */}
             <div className="p-7 rounded-3xl bg-white dark:bg-[#111927] border border-cyan-500/30 dark:border-cyan-500/20 shadow-sm space-y-4 hover:shadow-xl hover:border-cyan-500/60 transition-all flex flex-col justify-between group">
               <div className="space-y-3">

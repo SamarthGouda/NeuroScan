@@ -13,7 +13,7 @@ import uuid
 import json
 
 from database import get_db, DiagnosticReport, Scan, Analysis, Patient, Case, User
-from auth import get_current_user, get_optional_user, log_audit_event
+from auth import get_current_user, require_role, log_audit_event
 from report.report_generator import generate_clinical_report
 
 router = APIRouter()
@@ -39,7 +39,7 @@ def _format_report(report: DiagnosticReport) -> dict:
 @router.get("/reports")
 def list_reports(
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
     limit: int = 50,
 ):
     reports = db.query(DiagnosticReport).order_by(desc(DiagnosticReport.created_at)).limit(limit).all()
@@ -50,7 +50,7 @@ def list_reports(
 def get_report(
     report_id: str,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
 ):
     report = db.query(DiagnosticReport).filter(DiagnosticReport.id == report_id).first()
     if not report:
@@ -65,7 +65,7 @@ def get_report(
 def get_scan_reports(
     scan_id: str,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
 ):
     reports = db.query(DiagnosticReport).filter(DiagnosticReport.scan_id == scan_id).order_by(desc(DiagnosticReport.version)).all()
     return [_format_report(r) for r in reports]
@@ -76,7 +76,7 @@ def generate_report_for_scan(
     scan_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
 ):
     scan = db.query(Scan).filter(Scan.id == scan_id).first()
     if not scan or not scan.analysis:
@@ -146,7 +146,7 @@ def download_report(
     report_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
 ):
     report = db.query(DiagnosticReport).filter(DiagnosticReport.id == report_id).first()
     if not report:

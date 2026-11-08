@@ -4,9 +4,14 @@ All constants, paths, and hyperparameters in one place.
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # ─── Project Paths ──────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent  # Brain Tumor Advanced/
+
+# Load environment variables from .env file automatically
+load_dotenv(BASE_DIR / ".env", override=True)
+
 DATA_ROOT = BASE_DIR / "dataset"
 TRAIN_DIR = DATA_ROOT / "Training"
 TEST_DIR = DATA_ROOT / "Testing"

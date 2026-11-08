@@ -19,7 +19,7 @@ from sqlalchemy import desc
 from PIL import Image
 
 from database import get_db, Patient, Scan, Analysis, Case, DiagnosticReport, User, create_notification
-from auth import get_current_user, get_optional_user, log_audit_event
+from auth import get_current_user, get_optional_user, require_role, log_audit_event
 from config import BASE_DIR, CLASS_DISPLAY, MAX_UPLOAD_SIZE_BYTES, ALLOWED_IMAGE_EXTENSIONS
 
 router = APIRouter()
@@ -163,7 +163,7 @@ async def upload_and_analyze_scan(
     patientPhoneNumber: Optional[str] = Form(None),
     hospitalName: Optional[str] = Form(None),
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "technician", "admin"])),
 ):
     """
     Primary MRI Upload & Analysis Endpoint.
@@ -375,7 +375,7 @@ async def upload_and_analyze_scan(
 @router.get("/scans")
 def list_scans(
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(get_current_user),
     limit: int = 100,
 ):
     scans = db.query(Scan).order_by(desc(Scan.created_at)).limit(limit).all()
@@ -386,7 +386,7 @@ def list_scans(
 def get_scan(
     scan_id: str,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(get_current_user),
 ):
     scan = db.query(Scan).filter(Scan.id == scan_id).first()
     if not scan:
@@ -399,7 +399,7 @@ def toggle_archive_scan(
     scan_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
 ):
     scan = db.query(Scan).filter(Scan.id == scan_id).first()
     if not scan:

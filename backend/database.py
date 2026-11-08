@@ -17,7 +17,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import (
-    Column, String, Float, Integer, Boolean, Text, DateTime, ForeignKey, create_engine, desc
+    Column, String, Float, Integer, Boolean, Text, DateTime, ForeignKey, create_engine, desc, text, UniqueConstraint
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 
@@ -51,20 +51,62 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    id            = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    username      = Column(String(50), unique=True, nullable=False, index=True)
-    email         = Column(String(120), unique=True, nullable=False, index=True)
-    full_name     = Column(String(100), nullable=False)
-    role          = Column(String(20), nullable=False, default="doctor")   # doctor | technician | admin
-    password_hash = Column(String(255), nullable=False)
-    title         = Column(String(100), nullable=True)                    # e.g., "Senior Neuroradiologist"
-    avatar        = Column(String(10), nullable=True)                     # Initials, e.g., "SC"
-    is_active     = Column(Boolean, default=True, nullable=False)
-    created_at    = Column(DateTime, default=datetime.utcnow)
+    id                          = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    username                    = Column(String(50), unique=True, nullable=False, index=True)
+    email                       = Column(String(120), unique=True, nullable=False, index=True)
+    full_name                   = Column(String(100), nullable=False)
+    role                        = Column(String(20), nullable=False, default="doctor")   # Primary / default role
+    password_hash               = Column(String(255), nullable=False)
+    title                       = Column(String(100), nullable=True)                    # e.g., "Senior Neuroradiologist"
+    avatar                      = Column(String(10), nullable=True)                     # Initials, e.g., "SC"
+    is_active                   = Column(Boolean, default=True, nullable=False)
+    is_email_verified           = Column(Boolean, default=False, nullable=False)
+    google_sub                  = Column(String(100), nullable=True, unique=True, index=True)
+    email_verification_token    = Column(String(255), nullable=True)
+    email_verification_expires_at = Column(DateTime, nullable=True)
+    active_role                 = Column(String(20), nullable=True)
+    created_at                  = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    scans         = relationship("Scan", back_populates="user")
-    cases         = relationship("Case", back_populates="assigned_doctor")
+    roles                       = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
+    scans                       = relationship("Scan", back_populates="user")
+    cases                       = relationship("Case", back_populates="assigned_doctor")
+
+
+class UserRole(Base):
+    """Multiple authorized role memberships linked to a single verified user identity."""
+    __tablename__ = "user_roles"
+    __table_args__ = (UniqueConstraint("user_id", "role", name="uq_user_role"),)
+
+    id          = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id     = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    role        = Column(String(20), nullable=False, index=True)   # admin | doctor | technician
+    assigned_at = Column(DateTime, default=datetime.utcnow)
+    assigned_by = Column(String, nullable=True)
+
+    # Relationships
+    user        = relationship("User", back_populates="roles")
+
+
+class RevokedToken(Base):
+    """Server-side session invalidation / token revocation blacklist."""
+    __tablename__ = "revoked_tokens"
+
+    id         = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    token_jti  = Column(String(64), unique=True, index=True, nullable=False)
+    revoked_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False, index=True)
+
+
+class OAuthState(Base):
+    """CSRF state verification store for OAuth 2.0 flows."""
+    __tablename__ = "oauth_states"
+
+    id           = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    state        = Column(String(128), unique=True, index=True, nullable=False)
+    redirect_url = Column(String(255), nullable=True)
+    created_at   = Column(DateTime, default=datetime.utcnow)
+    expires_at   = Column(DateTime, nullable=False, index=True)
 
 
 class Patient(Base):
@@ -274,66 +316,66 @@ def create_notification(
 
 
 
-# ─── Initialization & Seeding ─────────────────────────────────────────────────
+# ─── Initialization & Schema Migration ────────────────────────────────────────
 
 def create_tables():
+    """
+    Creates all application tables and runs backward-compatible schema migrations:
+    - Adds new security & multi-role columns to `users` if missing
+    - Creates `user_roles`, `revoked_tokens`, `oauth_states`
+    - Populates `user_roles` for existing users
+    - Strict removal of all hardcoded demo credentials
+    """
     Base.metadata.create_all(bind=engine)
-    _seed_default_users()
+    _migrate_schema()
 
 
-def _seed_default_users():
-    """Seed initial Doctor, Technician, and Admin accounts if not present."""
-    from auth import hash_password
+def _migrate_schema():
+    """Ensure backward-compatible schema migration without data loss."""
+    with engine.connect() as conn:
+        is_sqlite = engine.dialect.name == "sqlite"
+        if is_sqlite:
+            res = conn.execute(text("PRAGMA table_info(users)"))
+            existing_cols = {row[1] for row in res.fetchall()}
 
+            new_columns = [
+                ("is_email_verified", "BOOLEAN DEFAULT 0 NOT NULL"),
+                ("google_sub", "VARCHAR(100)"),
+                ("email_verification_token", "VARCHAR(255)"),
+                ("email_verification_expires_at", "DATETIME"),
+                ("active_role", "VARCHAR(20)"),
+            ]
+            for col_name, col_type in new_columns:
+                if col_name not in existing_cols:
+                    try:
+                        conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
+                        print(f"[DB Migration] Added column '{col_name}' to users table.")
+                    except Exception as e:
+                        print(f"[DB Migration] Notice on column '{col_name}': {e}")
+            conn.commit()
+
+    # Populate user_roles for any existing users that lack them
     db: Session = SessionLocal()
     try:
-        default_users = [
-            {
-                "username": "doctor",
-                "email": "doctor@neuroscan.ai",
-                "full_name": "Dr. Sarah Chen",
-                "role": "doctor",
-                "password": "doctor123",
-                "title": "Lead Neuroradiologist",
-                "avatar": "SC",
-            },
-            {
-                "username": "tech",
-                "email": "tech@neuroscan.ai",
-                "full_name": "Alex Martinez",
-                "role": "technician",
-                "password": "tech123",
-                "title": "Senior MRI Technologist",
-                "avatar": "AM",
-            },
-            {
-                "username": "admin",
-                "email": "admin@neuroscan.ai",
-                "full_name": "Prof. James Liu",
-                "role": "admin",
-                "password": "admin123",
-                "title": "Chief Hospital Administrator",
-                "avatar": "JL",
-            },
-        ]
+        users = db.query(User).all()
+        for u in users:
+            # Existing legacy records are marked verified so existing scans/patients aren't locked out
+            if not u.is_email_verified:
+                u.is_email_verified = True
 
-        for u in default_users:
-            existing = db.query(User).filter(User.username == u["username"]).first()
-            if not existing:
-                new_user = User(
-                    username=u["username"],
-                    email=u["email"],
-                    full_name=u["full_name"],
-                    role=u["role"],
-                    password_hash=hash_password(u["password"]),
-                    title=u["title"],
-                    avatar=u["avatar"],
-                    is_active=True,
+            existing_roles = db.query(UserRole).filter(UserRole.user_id == u.id).all()
+            if not existing_roles and u.role:
+                new_ur = UserRole(
+                    user_id=u.id,
+                    role=u.role.lower().strip(),
+                    assigned_by="system_migration",
                 )
-                db.add(new_user)
+                db.add(new_ur)
+                if not u.active_role:
+                    u.active_role = u.role.lower().strip()
         db.commit()
     except Exception as e:
-        print(f"[DB] Error seeding default users: {e}")
+        print(f"[DB Migration] Error backfilling user_roles: {e}")
         db.rollback()
     finally:
         db.close()

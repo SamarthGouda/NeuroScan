@@ -6,9 +6,15 @@ If SMTP credentials are not configured, securely logs the action
 and provides developer mock output without crashing.
 """
 import smtplib
+import sys
+from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
+
+_ROOT = Path(__file__).resolve().parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 from config import (
     SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD,
@@ -17,8 +23,12 @@ from config import (
 
 
 def is_smtp_configured() -> bool:
-    """Returns True if minimum required SMTP settings are present."""
-    return bool(SMTP_HOST and SMTP_PORT and SMTP_FROM)
+    """Returns True if minimum required SMTP settings are present and not placeholders."""
+    if not (SMTP_HOST and SMTP_PORT and SMTP_USER and SMTP_PASSWORD):
+        return False
+    if "your-" in SMTP_USER or "your-" in SMTP_PASSWORD:
+        return False
+    return True
 
 
 def send_otp_email(to_email: str, otp_code: str, purpose: str = "login") -> bool:
@@ -29,7 +39,9 @@ def send_otp_email(to_email: str, otp_code: str, purpose: str = "login") -> bool
     subject_map = {
         "login": "NeuroVision — Your Clinical Authentication Code",
         "register": "NeuroVision — Complete Your Account Registration",
+        "verify_email": "NeuroVision — Verify Your Clinical Email Address",
         "reset_password": "NeuroVision — Password Reset Verification Code",
+        "role_switch": "NeuroVision — Security Alert: Clinical Role Switched",
     }
     subject = subject_map.get(purpose, "NeuroVision — Verification Code")
 
@@ -77,7 +89,8 @@ def send_otp_email(to_email: str, otp_code: str, purpose: str = "login") -> bool
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
-        msg["From"] = SMTP_FROM
+        sender_email = SMTP_USER if SMTP_USER else SMTP_FROM
+        msg["From"] = f"NeuroVision AI <{sender_email}>"
         msg["To"] = to_email
 
         text_part = MIMEText(f"Your NeuroVision verification code is: {otp_code}. Valid for 10 minutes.", "plain")
@@ -94,7 +107,7 @@ def send_otp_email(to_email: str, otp_code: str, purpose: str = "login") -> bool
         if SMTP_USER and SMTP_PASSWORD:
             server.login(SMTP_USER, SMTP_PASSWORD)
 
-        server.sendmail(SMTP_FROM, [to_email], msg.as_string())
+        server.sendmail(sender_email, [to_email], msg.as_string())
         server.quit()
         print(f"[EmailService] Successfully sent OTP email to {to_email}")
         return True

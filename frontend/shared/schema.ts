@@ -6,10 +6,12 @@ export interface User {
   lastName?: string;
   fullName: string;
   role: "doctor" | "technician" | "admin" | string;
+  roles?: string[];
   title?: string;
   avatar?: string;
   profileImageUrl?: string;
   isActive?: boolean;
+  isEmailVerified?: boolean;
   status?: string;
   permissions?: string[];
 }

@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,16 +46,62 @@ function DashboardDispatcher({ role }: { role: string }) {
   return <DoctorDashboard />;
 }
 
+function ForbiddenAccess({ requiredRole, userRole }: { requiredRole: string; userRole: string }) {
+  const { user, switchRole, isSwitchingRole } = useAuth();
+  const canSwitch = Boolean(user?.roles?.includes(requiredRole));
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
+      <div className="h-16 w-16 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-4 shadow-lg">
+        <ShieldCheck className="h-8 w-8" />
+      </div>
+      <h2 className="text-xl font-bold text-foreground">Access Restricted (403 Forbidden)</h2>
+      <p className="text-sm text-muted-foreground max-w-md mt-2 leading-relaxed">
+        This module requires <span className="font-semibold text-foreground uppercase">{requiredRole}</span> role permissions.
+        Your current active session is operating as <span className="font-semibold text-foreground uppercase">{userRole}</span>.
+      </p>
+      {canSwitch ? (
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <p className="text-xs text-cyan-500 dark:text-cyan-400 font-mono">
+            Your single identity is authorized for this role.
+          </p>
+          <Button
+            onClick={() => switchRole(requiredRole)}
+            disabled={isSwitchingRole}
+            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-md"
+          >
+            {isSwitchingRole ? "Switching Workspace..." : `Switch to ${requiredRole.toUpperCase()} Workspace`}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-6">
+          <Link href="/">
+            <Button variant="outline" className="text-xs rounded-xl">
+              Return to Active Dashboard
+            </Button>
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MainRouter({ role }: { role: string }) {
   return (
     <Switch>
       <Route path="/">
         {() => <DashboardDispatcher role={role} />}
       </Route>
-      <Route path="/doctor" component={DoctorDashboard} />
-      <Route path="/technician" component={TechnicianDashboard} />
-      <Route path="/admin" component={AdminDashboard} />
-      
+      <Route path="/doctor">
+        {() => (role === "doctor" || role === "admin" ? <DoctorDashboard /> : <ForbiddenAccess requiredRole="doctor" userRole={role} />)}
+      </Route>
+      <Route path="/technician">
+        {() => (role === "technician" || role === "admin" ? <TechnicianDashboard /> : <ForbiddenAccess requiredRole="technician" userRole={role} />)}
+      </Route>
+      <Route path="/admin">
+        {() => (role === "admin" ? <AdminDashboard /> : <ForbiddenAccess requiredRole="admin" userRole={role} />)}
+      </Route>
+
       <Route path="/upload" component={UploadPage} />
       <Route path="/doctor/upload" component={UploadPage} />
       <Route path="/technician/upload" component={UploadPage} />
@@ -65,28 +112,110 @@ function MainRouter({ role }: { role: string }) {
 
       <Route path="/scan/:id" component={ScanAnalysis} />
       <Route path="/report/:id" component={ReportPage} />
-      <Route path="/reports" component={ReportsPage} />
+      <Route path="/reports">
+        {() => (role === "technician" ? <ForbiddenAccess requiredRole="doctor" userRole={role} /> : <ReportsPage />)}
+      </Route>
 
       <Route path="/users">
-        {() => (role === "admin" ? <UsersPage /> : <DoctorDashboard />)}
+        {() => (role === "admin" ? <UsersPage /> : <ForbiddenAccess requiredRole="admin" userRole={role} />)}
       </Route>
       <Route path="/admin/users">
-        {() => (role === "admin" ? <UsersPage /> : <DoctorDashboard />)}
+        {() => (role === "admin" ? <UsersPage /> : <ForbiddenAccess requiredRole="admin" userRole={role} />)}
       </Route>
 
       <Route path="/audit-logs">
-        {() => (role === "admin" ? <AuditLogsPage /> : <DoctorDashboard />)}
+        {() => (role === "admin" ? <AuditLogsPage /> : <ForbiddenAccess requiredRole="admin" userRole={role} />)}
       </Route>
       <Route path="/admin/audit-logs">
-        {() => (role === "admin" ? <AuditLogsPage /> : <DoctorDashboard />)}
+        {() => (role === "admin" ? <AuditLogsPage /> : <ForbiddenAccess requiredRole="admin" userRole={role} />)}
       </Route>
 
       <Route path="/statistics" component={StatisticsPage} />
       <Route path="/admin/statistics" component={StatisticsPage} />
-      
+
       <Route path="/settings" component={SettingsPage} />
       <Route component={NotFound} />
     </Switch>
+  );
+}
+
+function RoleSwitcher() {
+  const { user, switchRole, isSwitchingRole } = useAuth();
+  const { toast } = useToast();
+  if (!user) return null;
+
+  const roles = user.roles || [user.role];
+  if (roles.length <= 1) return null;
+
+  const currentRole = user.role;
+
+  const roleMeta: Record<string, { label: string; badge: string; color: string; icon: any }> = {
+    admin: { label: "Hospital Administrator", badge: "Admin", color: "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/30", icon: ShieldCheck },
+    doctor: { label: "Lead Neuroradiologist", badge: "Doctor", color: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border-cyan-500/30", icon: Stethoscope },
+    technician: { label: "MRI Technologist", badge: "Technician", color: "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30", icon: Activity },
+  };
+
+  const handleRoleChange = async (targetRole: string) => {
+    if (targetRole === currentRole || isSwitchingRole) return;
+    try {
+      await switchRole(targetRole);
+      toast({
+        title: `Workspace Switched: ${targetRole.toUpperCase()}`,
+        description: `Now operating with ${roleMeta[targetRole]?.label || targetRole} privileges.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Role Switch Denied",
+        description: err.message || "Could not switch role.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const currentMeta = roleMeta[currentRole] || roleMeta.doctor;
+  const CurrentIcon = currentMeta.icon;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isSwitchingRole}
+          className={`h-8 px-2.5 rounded-lg border font-mono text-xs flex items-center gap-1.5 transition-all shadow-xs ${currentMeta.color}`}
+          data-testid="button-role-switcher"
+        >
+          <CurrentIcon className="h-3.5 w-3.5 shrink-0" />
+          <span className="font-semibold uppercase tracking-wide">{currentMeta.badge}</span>
+          <span className="text-[10px] opacity-60">▼</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56 bg-card text-foreground">
+        <DropdownMenuLabel className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          Switch Workspace Role
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {roles.map((r) => {
+          const meta = roleMeta[r] || { label: r, badge: r.toUpperCase(), color: "", icon: Brain };
+          const IconComp = meta.icon;
+          const isSelected = r === currentRole;
+          return (
+            <DropdownMenuItem
+              key={r}
+              onClick={() => handleRoleChange(r)}
+              className={`cursor-pointer text-xs flex items-center justify-between py-2 ${isSelected ? "bg-cyan-500/10 text-cyan-400 font-bold" : ""
+                }`}
+            >
+              <div className="flex items-center gap-2">
+                <IconComp className="h-3.5 w-3.5 shrink-0" />
+                <span>{meta.label}</span>
+              </div>
+              {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />}
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -123,9 +252,16 @@ function UserMenu() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-bold leading-none">{user.fullName}</p>
             <p className="text-xs text-muted-foreground leading-none">{user.email}</p>
-            <Badge variant="outline" className="w-fit text-[10px] mt-1 font-mono uppercase">
-              {user.role}
-            </Badge>
+            <div className="flex flex-wrap gap-1 mt-1">
+              <Badge variant="outline" className="w-fit text-[10px] font-mono uppercase bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+                Active: {user.role}
+              </Badge>
+              {user.roles && user.roles.length > 1 && (
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  ({user.roles.length} roles)
+                </span>
+              )}
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -165,7 +301,7 @@ function AuthenticatedContent() {
             <div className="flex items-center gap-3">
               <SidebarTrigger data-testid="button-sidebar-toggle" className="hover:bg-cyan-500/10 hover:text-cyan-400 transition-colors" />
               <div className="h-4 w-px bg-border/80 hidden sm:block" />
-              
+
               <div className="hidden sm:flex items-center gap-2 text-xs font-medium">
                 <span className="text-muted-foreground">Workstation:</span>
                 <Badge variant="outline" className="text-[11px] font-mono text-cyan-400 bg-cyan-500/10 border-cyan-500/30 flex items-center gap-1.5 px-2 py-0.5">
@@ -189,6 +325,7 @@ function AuthenticatedContent() {
                 <Activity className="h-3 w-3 text-cyan-400" />
                 <span>PACS DICOM Sync: Active</span>
               </div>
+              <RoleSwitcher />
               <ThemeToggle />
               <UserMenu />
             </div>

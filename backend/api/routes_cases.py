@@ -11,7 +11,7 @@ from sqlalchemy import desc
 from typing import Optional, List
 
 from database import get_db, Case, Patient, Scan, Analysis, User, DiagnosticReport
-from auth import get_current_user, get_optional_user, log_audit_event
+from auth import get_current_user, require_role, log_audit_event
 
 router = APIRouter()
 
@@ -62,7 +62,7 @@ def list_cases(
     status: Optional[str] = None,
     priority: Optional[str] = None,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "technician", "admin"])),
 ):
     q = db.query(Case).order_by(desc(Case.created_at))
     if status:
@@ -77,7 +77,7 @@ def list_cases(
 def get_case(
     case_id: str,
     db: Session = Depends(get_db),
-    user: Optional[User] = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "technician", "admin"])),
 ):
     case = db.query(Case).filter((Case.id == case_id) | (Case.case_number == case_id)).first()
     if not case:
@@ -91,7 +91,7 @@ def update_case(
     req: CaseUpdateRequest,
     request: Request,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    user: User = Depends(require_role(["doctor", "admin"])),
 ):
     case = db.query(Case).filter((Case.id == case_id) | (Case.case_number == case_id)).first()
     if not case:

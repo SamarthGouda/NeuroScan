@@ -14,7 +14,7 @@ import json
 from pathlib import Path
 
 from database import get_db, Scan, Analysis, Patient, User, create_notification
-from auth import get_optional_user, log_audit_event
+from auth import require_role, log_audit_event
 from config import BASE_DIR, MAX_UPLOAD_SIZE_BYTES, ALLOWED_IMAGE_EXTENSIONS
 from api.routes_scans import validate_image_security
 
@@ -33,7 +33,7 @@ async def predict(
     request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    user: User = Depends(get_optional_user),
+    user: User = Depends(require_role(["doctor", "technician", "admin"])),
 ):
     predictor = get_predictor(request)
     if predictor is None:

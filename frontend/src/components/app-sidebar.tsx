@@ -71,7 +71,7 @@ const roleDisplay: Record<string, { label: string; badge: string; color: string 
 export function AppSidebar() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
-  
+
   const userRole = user?.role || "doctor";
   const menuItems = menuConfig[userRole] || menuConfig.doctor;
   const roleInfo = roleDisplay[userRole] || roleDisplay.doctor;
@@ -85,9 +85,16 @@ export function AppSidebar() {
         </div>
         <div className="mt-2 flex items-center justify-between">
           <p className="text-[11px] text-muted-foreground truncate">{user?.fullName || roleInfo.label}</p>
-          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${roleInfo.color}`}>
-            {roleInfo.badge}
-          </Badge>
+          <div className="flex items-center gap-1">
+            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${roleInfo.color}`}>
+              {roleInfo.badge}
+            </Badge>
+            {user?.roles && user.roles.length > 1 && (
+              <Badge variant="outline" className="text-[9px] px-1 py-0 font-mono text-cyan-400 bg-cyan-500/10 border-cyan-500/20" title={`Authorized roles: ${user.roles.join(', ')}`}>
+                +{user.roles.length - 1}
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* AI Engine Telemetry Pill */}
@@ -119,11 +126,10 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`relative w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-xs font-medium transition-all duration-200 ${
-                        isActive
+                      className={`relative w-full justify-start gap-3 rounded-lg px-3 py-2.5 text-xs font-medium transition-all duration-200 ${isActive
                           ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-sm font-semibold before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-1 before:rounded-r before:bg-cyan-400"
                           : "text-muted-foreground hover:bg-card hover:text-foreground hover:border hover:border-border/50"
-                      }`}
+                        }`}
                       data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <Link href={item.url}>
