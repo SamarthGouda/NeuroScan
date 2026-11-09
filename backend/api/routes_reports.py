@@ -65,10 +65,11 @@ def get_report(
 def get_scan_reports(
     scan_id: str,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(["doctor", "admin"])),
+    user: User = Depends(require_role(["doctor", "admin", "technician"])),
 ):
     reports = db.query(DiagnosticReport).filter(DiagnosticReport.scan_id == scan_id).order_by(desc(DiagnosticReport.version)).all()
     return [_format_report(r) for r in reports]
+
 
 
 @router.post("/scans/{scan_id}/reports/generate")

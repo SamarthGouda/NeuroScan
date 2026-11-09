@@ -1,0 +1,34 @@
+1
+00:00:00,500 --> 00:00:03,000
+NEUROSCAN AI
+Next-Generation Neuro-Oncology Decision Support
+
+2
+00:00:03,200 --> 00:00:05,300
+AUTOMATED MRI INGESTION
+DICOM & Axial Tensor Validation · Instant Preprocessing
+
+3
+00:00:05,500 --> 00:00:08,800
+HYBRID DEEP LEARNING
+Glioma Detection · 99.9% AUC · Bayesian Uncertainty Quantification
+
+4
+00:00:09,000 --> 00:00:11,800
+ATTENTION U-NET SEGMENTATION
+Pixel-Level Mask Overlays · Accurate Lesion Area Volumetrics
+
+5
+00:00:12,000 --> 00:00:15,000
+EXPLAINABLE AI SUITE
+Grad-CAM · Grad-CAM++ · Integrated Gradients Attribution
+
+6
+00:00:15,200 --> 00:00:17,500
+RADIOMICS & SHAP PROFILING
+10 High-Order Texture Features · Explainable Feature Importance
+
+7
+00:00:17,700 --> 00:00:20,000
+NEUROSCAN AI
+Clinical-Grade Accuracy · Resilient Architectural Design

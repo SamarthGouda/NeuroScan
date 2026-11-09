@@ -56,6 +56,9 @@ dataset/
 # Local backups
 _backup_neuroscan/
 
+# Video production intermediate frames
+marketing_assets/intro_video/assets/frames/
+
 # Uploads & temporary artifacts
 uploads/*
 !uploads/.gitkeep
